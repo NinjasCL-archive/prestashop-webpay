@@ -32,7 +32,7 @@ class WebpayKcc extends PaymentModule {
 
 		$this->ps_versions_compliancy = array(
 								'min' => '1.6', 
-								'max' => __PS_VERSION__);
+								'max' => _PS_VERSION_);
 
 		// This is for the views
 		// This module does not use twitter bootstrap
