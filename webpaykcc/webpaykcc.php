@@ -64,4 +64,19 @@ class WebpayKcc extends PaymentModule {
 		// All is good
 		return true;
 	}
+
+	// Uninstall function
+	// clean all the data
+	// and remove the module
+	public function uninstall() {
+		
+		// Clean all data
+		// after the parent 
+		// uninstall
+		if(!parent::uninstall())
+			return false;
+
+		
+		return ture;
+	}
 }
