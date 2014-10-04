@@ -80,7 +80,12 @@ class WebpayKcc extends PaymentModule {
 		if(!parent::uninstall())
 			return false;
 
-		
+		// Drop the paymentmethod table
+        Db::getInstance()->execute("DROP TABLE if exists {$this->dbPmInfo}");
+
+        // Drop the paymentmethod raw data table
+        Db::getInstance()->execute("DROP TABLE if exists {$this->dbRawData}");
+
 		return true;
 	}
 
@@ -206,6 +211,6 @@ class WebpayKcc extends PaymentModule {
 	// sets the default settings
 	// if needed
 	private function setModuleSettings() {
-		
+
 	}
 }
