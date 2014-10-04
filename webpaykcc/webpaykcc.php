@@ -77,6 +77,6 @@ class WebpayKcc extends PaymentModule {
 			return false;
 
 		
-		return ture;
+		return true;
 	}
 }
