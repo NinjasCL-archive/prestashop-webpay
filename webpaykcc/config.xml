@@ -1,29 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-<name>webpaykcc</name>
-<displayName>
-<![CDATA[ Webpay KCC Payment ]]>
-</displayName>
-<version>
-<![CDATA[ 1.0.0 ]]>
-</version>
-<description>
-<![CDATA[
-Payment Gateway using Chile&#039;s Transbank Webpay KCC
-]]>
-</description>
-<author>
-<![CDATA[ Camilo Castro &lt;camilo@cervezapps.cl&gt; ]]>
-</author>
-<tab>
-<![CDATA[ payments_gateway ]]>
-</tab>
-<confirmUninstall>
-<![CDATA[
-Payments with Webpay KCC will not be possible. Are you sure to uninstall?
-]]>
-</confirmUninstall>
-<is_configurable>1</is_configurable>
-<need_instance>1</need_instance>
-<limited_countries/>
+    <name>webpaykcc</name>
+    <displayName><![CDATA[ Webpay KCC Payment ]]></displayName>
+    <version><![CDATA[ 1.0.0 ]]></version>
+    <description><![CDATA[Payment Gateway using Chile&#039;s Transbank Webpay KCC]]></description>
+    <author><![CDATA[ Camilo Castro &lt;camilo@cervezapps.cl&gt; ]]></author>
+    <tab><![CDATA[ payments_gateway ]]></tab>
+    <confirmUninstall><![CDATA[Payments with Webpay KCC will not be possible. Are you sure to uninstall?]]></confirmUninstall>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+    <limited_countries></limited_countries>
 </module>
