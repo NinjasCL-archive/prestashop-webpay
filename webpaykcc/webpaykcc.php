@@ -193,4 +193,12 @@ class WebpayKcc extends PaymentModule {
 
 		return $html;
 	}
+
+	// This private method
+	// fills the error property
+	// if there is a configuration
+	// related error
+	private function checkModuleRequirements() {
+		
+	}
 }
