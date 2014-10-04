@@ -137,7 +137,7 @@ class WebpayKcc extends PaymentModule {
 	// This is the Confirmation Page
 	// Show all the details before 
 	// commit the payment and call the bank
-	public function hookPayment($params) {
+	public function hookPaymentReturn($params) {
 
 		// Only show if the module
 		// is active
