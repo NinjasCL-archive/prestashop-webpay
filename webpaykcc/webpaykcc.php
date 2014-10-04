@@ -102,6 +102,7 @@ class WebpayKcc extends PaymentModule {
 		$activeShopID = (int) Context::getContext()->shop()->id;
 
 		// Look for webpay logo
+		// inside the current folder
 		$logo = Tools::getShopDomainSsl(true, true) 
 				. __PS_BASE_URI__ 
 				. "modules/{$this->name}/logo-small.png";
