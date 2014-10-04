@@ -9,6 +9,10 @@ if (!defined('_PS_VERSION_'))
 */
 class WebpayKcc extends PaymentModule {
 
+	// Holds errors that could happen
+	// in configuration page
+	protected $_errors = array();
+	
 	public function __construct() {
 		
 		// Basic Settings
@@ -109,7 +113,7 @@ class WebpayKcc extends PaymentModule {
 		//
 		// Assign the variables
 		// for use inside the template
-				
+
 		$this->context->smarty->assign(array(
 			'logo' => $logo
 		));
@@ -160,6 +164,9 @@ class WebpayKcc extends PaymentModule {
 	// also gets the configuration values and updates them
 
 	public function getContent() {
+
+		// Get the active shop id if in multistore shop
+		$activeShopID = (int) Context::getContext()->shop()->id;
 
 	}
 }
