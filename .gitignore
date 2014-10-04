@@ -27,3 +27,6 @@ themes/default/cache/*.css
 # Ignore files on root directory
 robots.txt
 sitemap.xml
+
+# KCC files
+kcc/
