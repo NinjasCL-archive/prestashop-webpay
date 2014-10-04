@@ -93,10 +93,6 @@ class WebpayKcc extends PaymentModule {
 		if(!$this->active)
 			return;
 
-		// The smarty template engine
-		// will be used to render
-		// the html
-		global $smarty;
 
 		// Get the active shop id if in multistore shop
 		$activeShopID = (int) Context::getContext()->shop()->id;
@@ -107,9 +103,14 @@ class WebpayKcc extends PaymentModule {
 				. __PS_BASE_URI__ 
 				. "modules/{$this->name}/logo-small.png";
 
+		// The smarty template engine
+		// will be used to render
+		// the html
+		//
 		// Assign the variables
 		// for use inside the template
-		$smarty->assign(array(
+				
+		$this->context->smarty->assign(array(
 			'logo' => $logo
 		));
 
@@ -129,10 +130,6 @@ class WebpayKcc extends PaymentModule {
 		if(!$this->active)
 			return;
 
-		// The smarty template engine
-		// will be used to render
-		// the html
-		global $smarty;
 
 		// Get the active shop id if in multistore shop
 		$activeShopID = (int) Context::getContext()->shop()->id;
@@ -142,9 +139,13 @@ class WebpayKcc extends PaymentModule {
 		// Do formatting
 		// Check that everything is OK
 
+		// The smarty template engine
+		// will be used to render
+		// the html
+
 		// Assign the variables
 		// for use inside the template
-		$smarty->assign(array(
+		$this->context->smarty->assign(array(
 		
 		));
 
@@ -152,5 +153,13 @@ class WebpayKcc extends PaymentModule {
 		$html = $this->display(__FILE__, 'confirmation.tpl');
 
 		return $html;
+	}
+
+	// This function renders the configuration
+	// page for the module inside admin
+	// also gets the configuration values and updates them
+
+	public function getContent() {
+
 	}
 }
