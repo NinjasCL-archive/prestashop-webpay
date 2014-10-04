@@ -204,6 +204,20 @@ class WebpayKcc extends PaymentModule {
 	// if there is a configuration
 	// related error
 	private function checkModuleRequirements() {
+		$this->_errors = array();
+
+		if($this->kccPath == '') {
+			$this->_errors['kccPath'] = $this->l('KCC Path is not Set');
+		}
+
+		if($this->kccURL == '') {
+			$this->_errors['kccURL'] = $this->l('KCC URL is not Set');
+		}
+
+		if($this->kccLogPath == '') {
+			$this->_errors['kccLogPath'] = $this->l('KCC Log Path is not Set');
+		}
+
 
 	}
 
