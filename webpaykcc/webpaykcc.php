@@ -3,6 +3,11 @@
 if (!defined('_PS_VERSION_'))
     exit;
 
+// Constants
+define('KCC_PATH', 'WEBPAY_KCC_PATH');
+define('KCC_URL', 'WEBPAY_KCC_URL');
+define('KCC_LOG', 'WEBPAY_KCC_LOGPATH');
+
 /**
 * This Class Holds the Admin
 * Part of the Webpay Module
@@ -176,6 +181,7 @@ class WebpayKcc extends PaymentModule {
 		// Check if the update flag is present
 		// and process the input
 		if(isset($_POST['webpaykcc_updateSettings'])) {
+			Configuration::updateValue()
 
 		// If there is no update flag
 		// Ensure that we use the default values 
@@ -225,8 +231,8 @@ class WebpayKcc extends PaymentModule {
 	// sets the default settings
 	// if needed
 	private function setModuleSettings() {
-		$this->kccPath = Configuration::get('WEBPAY_KCC_PATH');
-		$this->kccURL = Configuration::get('WEBPAY_KCC_URL');
-		$this->kccLogPath = Configuration::get('WEBPAY_KCC_LOGPATH');
+		$this->kccPath = Configuration::get(KCC_PATH);
+		$this->kccURL = Configuration::get(KCC_URL);
+		$this->kccLogPath = Configuration::get(KCC_LOG);
 	}
 }
