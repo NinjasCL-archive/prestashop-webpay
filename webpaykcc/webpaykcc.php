@@ -48,6 +48,20 @@ class WebpayKcc extends PaymentModule {
 
 		$this->checkModuleRequirements();
 
+	}
 
+	// Install Methods
+	// Set params before Module Installation
+	public function install() {
+
+		// wait for parent installation
+		// and register to hooks
+		if(!parent::install()||
+			!$this->registerHook('payment')||
+			!$this->registerHook('paymentReturn'))
+			return false;
+
+		// All is good
+		return true;
 	}
 }
