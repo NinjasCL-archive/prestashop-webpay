@@ -115,7 +115,7 @@ class WebpayKcc extends PaymentModule {
 		// inside the current folder
 		$logo = Tools::getShopDomainSsl(true, true) 
 				. __PS_BASE_URI__ 
-				. "modules/{$this->name}/logo-small.png";
+				. "modules/{$this->name}/logo.png";
 
 		// The smarty template engine
 		// will be used to render
@@ -195,7 +195,7 @@ class WebpayKcc extends PaymentModule {
 			$this->checkModuleRequirements();
 
 		// If there is no update flag
-		// Ensure that we use the default values 
+		// Ensure that we use the saved values 
 		} else {
 			$this->setModuleSettings();
 		}
@@ -206,8 +206,20 @@ class WebpayKcc extends PaymentModule {
 		//
 		// Assign the variables
 		// for use inside the template
+
+		// Image Header 
+		// For the Webpay Logo
+		$img_header = Tools::getShopDomainSsl(true, true)
+					. __PS_BASE_URI__
+					. "modules/{$this->name}/logo.png";
+
 		$this->context->smarty->assign(array(
-		
+			'errors' => $this->_errors,
+			'data_kccPath' => $this->kccPath,
+			'data_kccURL' => $this->kccURL,
+			'data_kccLogPath' => $this->kccLogPath,
+			'version' => $this->version,
+			'img_header' => $img_header
 		));
 
 		// Render the template
