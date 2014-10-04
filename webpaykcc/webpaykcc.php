@@ -118,4 +118,39 @@ class WebpayKcc extends PaymentModule {
 
 		return $html;
 	}
+
+	// This is the Confirmation Page
+	// Show all the details before 
+	// commit the payment and call the bank
+	public function hookPayment($params) {
+
+		// Only show if the module
+		// is active
+		if(!$this->active)
+			return;
+
+		// The smarty template engine
+		// will be used to render
+		// the html
+		global $smarty;
+
+		// Get the active shop id if in multistore shop
+		$activeShopID = (int) Context::getContext()->shop()->id;
+
+
+		// Get all the cart data
+		// Do formatting
+		// Check that everything is OK
+
+		// Assign the variables
+		// for use inside the template
+		$smarty->assign(array(
+		
+		));
+
+		// Render the template
+		$html = $this->display(__FILE__, 'confirmation.tpl');
+
+		return $html;
+	}
 }
