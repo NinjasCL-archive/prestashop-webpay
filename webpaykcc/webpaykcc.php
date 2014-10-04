@@ -79,4 +79,42 @@ class WebpayKcc extends PaymentModule {
 		
 		return true;
 	}
+
+	// This function is called when
+	// the user reach the payment
+	// selection screen
+	// we will show the option
+	// to pay using webpay
+
+	public function hookPayment($params) {
+		
+		// Only show if the module
+		// is active
+		if(!$this->active)
+			return;
+
+		// The smarty template engine
+		// will be used to render
+		// the html
+		global $smarty;
+
+		// Get the active shop id if in multistore shop
+		$activeShopID = (int) Context::getContext()->shop()->id;
+
+		// Look for webpay logo
+		$logo = Tools::getShopDomainSsl(true, true) 
+				. __PS_BASE_URI__ 
+				. "modules/{$this->name}/logo-small.png";
+
+		// Assign the variables
+		// for use inside the template
+		$smarty->assign(array(
+			'logo' => $logo
+		));
+
+		// Render the template
+		$html = $this->display(__FILE__, 'views/templates/hook/payment.tpl');
+
+		return $html;
+	}
 }
