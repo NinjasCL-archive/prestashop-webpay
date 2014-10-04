@@ -199,6 +199,13 @@ class WebpayKcc extends PaymentModule {
 	// if there is a configuration
 	// related error
 	private function checkModuleRequirements() {
+
+	}
+
+	// This private method
+	// sets the default settings
+	// if needed
+	private function setModuleSettings() {
 		
 	}
 }
