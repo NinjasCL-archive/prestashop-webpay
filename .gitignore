@@ -30,3 +30,9 @@ sitemap.xml
 
 # KCC files
 kcc/
+
+#Image Files
+img.cache/
+
+# Some files
+old.backup/
