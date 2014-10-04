@@ -225,6 +225,8 @@ class WebpayKcc extends PaymentModule {
 	// sets the default settings
 	// if needed
 	private function setModuleSettings() {
-
+		$this->kccPath = Configuration::get('WEBPAY_KCC_PATH');
+		$this->kccURL = Configuration::get('WEBPAY_KCC_URL');
+		$this->kccLogPath = Configuration::get('WEBPAY_KCC_LOGPATH');
 	}
 }
