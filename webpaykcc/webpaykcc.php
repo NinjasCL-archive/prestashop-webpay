@@ -12,7 +12,7 @@ class WebpayKcc extends PaymentModule {
 	// Holds errors that could happen
 	// in configuration page
 	protected $_errors = array();
-	
+
 	public function __construct() {
 		
 		// Basic Settings
@@ -146,7 +146,7 @@ class WebpayKcc extends PaymentModule {
 		// The smarty template engine
 		// will be used to render
 		// the html
-
+		//
 		// Assign the variables
 		// for use inside the template
 		$this->context->smarty->assign(array(
@@ -168,5 +168,29 @@ class WebpayKcc extends PaymentModule {
 		// Get the active shop id if in multistore shop
 		$activeShopID = (int) Context::getContext()->shop()->id;
 
+		// Check if the update flag is present
+		// and process the input
+		if(isset($_POST['webpaykcc_updateSettings'])) {
+
+		// If there is no update flag
+		// Ensure that we use the default values 
+		} else {
+			$this->setModuleSettings();
+		}
+
+		// The smarty template engine
+		// will be used to render
+		// the html
+		//
+		// Assign the variables
+		// for use inside the template
+		$this->context->smarty->assign(array(
+		
+		));
+
+		// Render the template
+		$html = $this->display(__FILE__, "views/templates/admin/config.tpl");
+
+		return $html;
 	}
 }
