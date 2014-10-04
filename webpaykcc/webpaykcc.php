@@ -181,7 +181,18 @@ class WebpayKcc extends PaymentModule {
 		// Check if the update flag is present
 		// and process the input
 		if(isset($_POST['webpaykcc_updateSettings'])) {
-			Configuration::updateValue()
+
+			// Update the values in database
+			// according to what the form sends
+			Configuration::updateValue(KCC_PATH, Tools::getValue('kccPath'));
+			Configuration::updateValue(KCC_URL, Tools::getValue('kccURL'));
+			Configuration::updateValue(KCC_LOG, Tools::getValue('kccLogPath'));
+
+			// Update the internal vars
+			$this->setModuleSettings();
+
+			// Check if the values are right
+			$this->checkModuleRequirements();
 
 		// If there is no update flag
 		// Ensure that we use the default values 
