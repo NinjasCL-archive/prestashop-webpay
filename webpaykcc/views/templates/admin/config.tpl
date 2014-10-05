@@ -17,27 +17,30 @@
             </div>
         {/if}
 
-        {if isset($errors.kccURL)}
-            <div class="error">
-                <p>{$errors.kccURL}</p>
-            </div>
-        {/if}
 
-        {if isset($errors.kccLogPath)}
-            <div class="error">
-                <p>{$errors.kccLogPath}</p>
-            </div>
-        {/if}
 
         <label for="kccPath">{l s='KCC Path' mod='webpaykcc'}</label>
 
         <div class="margin-form"><input type="text" size="33" id="kccPath" name="kccPath"
                                         value="{$data_kccPath}"/></div>
         
+        {if isset($errors.kccURL)}
+            <div class="error">
+                <p>{$errors.kccURL}</p>
+            </div>
+        {/if}
+
+
         <label for="kccURL">{l s='KCC URL' mod='webpaykcc'}</label>
 
         <div class="margin-form"><input type="text" size="33" name="kccURL"
                                         id="kccURL" value="{$data_kccURL}"/></div>
+
+        {if isset($errors.kccLogPath)}
+            <div class="error">
+                <p>{$errors.kccLogPath}</p>
+            </div>
+        {/if}
 
         <label for="kccLogPath">{l s='KCC Log Path' mod='webpaykcc'}</label>
 
