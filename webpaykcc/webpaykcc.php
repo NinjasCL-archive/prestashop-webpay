@@ -214,7 +214,7 @@ class WebpayKcc extends PaymentModule {
 		// Get a value from $_POST / $_GET. 
 		// If unavailable, take a default value.
 		
-		$status = Tools:getValue('status', 'OPEN');
+		$status = Tools::getValue('status', 'OPEN');
 
 		// The smarty template engine
 		// will be used to render
