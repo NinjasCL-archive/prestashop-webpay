@@ -38,11 +38,9 @@
 if (!defined('_PS_VERSION_'))
     exit;
 
-// Constants
-define('KCC_PATH', 'WEBPAY_KCC_PATH');
-define('KCC_URL', 'WEBPAY_KCC_URL');
-define('KCC_LOG', 'WEBPAY_KCC_LOGPATH');
 
+// Include Webpay Lib
+include_once (_PS_MODULE_DIR_ . 'webpaykcc/lib-webpaykcc/webpay.php');
 /**
 * This Class Holds the Admin
 * Part of the Webpay Module

@@ -38,7 +38,46 @@
 if (!defined('_PS_VERSION_'))
     exit;
 
+// Include Webpay Lib
+include_once (_PS_MODULE_DIR_ . 'webpaykcc/lib-webpaykcc/webpay.php');
+
+// This class holds the controller
+// for the frontend
 class WebpayKccPaymentModuleFrontController 
 	  extends ModuleFrontController {
+
+	  	// Constructor
+	  	public function __construct() {
+	  		parent::__construct();
+
+	  		// Hide Left column
+	  		$this->display_column_left = false;
+	  	}
+
+
+	  	// This method renders the view
+	  	// when the user will confirm
+	  	// his purchase
+
+	  	public function initContent() {
+	  		
+	  		// Instance a new variable
+	  		// and call the parent init method
+	  		$webpay = new WebpayKcc();
+	  		
+	  		parent::initContent();
+
+	  		// Get cart data
+	  		$cart = $this->context->cart;
+	  		$cartId self::$cart->id;
+
+	  		// Get customer data
+	  		$customer = $this->context->customer;
+
+	  		// Get KCC Vars
+	  		$kccPath = Configuration::get()
+
+
+	  	}
 
 }
