@@ -154,7 +154,7 @@ class WebpayKcc extends PaymentModule {
 
 
 		// Get the active shop id if in multistore shop
-		$activeShopID = (int) Context::getContext()->shop()->id;
+		$activeShopID = (int) Context::getContext()->shop->id;
 
 		// Look for webpay logo
 		// inside the current folder
@@ -191,7 +191,7 @@ class WebpayKcc extends PaymentModule {
 
 
 		// Get the active shop id if in multistore shop
-		$activeShopID = (int) Context::getContext()->shop()->id;
+		$activeShopID = (int) Context::getContext()->shop->id;
 
 
 		// Get all the cart data
