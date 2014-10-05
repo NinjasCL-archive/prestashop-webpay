@@ -23,7 +23,7 @@ class WebpayKcc extends PaymentModule {
 		// Basic Settings
 
 		$this->name = 'webpaykcc';
-		$this->tab = 'payments_gateway';
+		$this->tab = 'payments_gateways';
 
 		$this->version = '1.0.0';
 		$this->author = 'Camilo Castro <camilo@cervezapps.cl>';
