@@ -85,12 +85,22 @@ class WebpayKcc extends PaymentModule {
 		if(!parent::uninstall())
 			return false;
 
-		// Drop the paymentmethod table
-        Db::getInstance()->execute("DROP TABLE if exists {$this->dbPmInfo}");
+        // Drop table Closure
+        $drop_table = function($table_name) {
+            $query = "DROP TABLE IF EXISTS {$table_name}";
 
-        // Drop the paymentmethod raw data table
-        Db::getInstance()->execute("DROP TABLE if exists {$this->dbRawData}");
+            if(!is_null($table_name))
+                if($table_name != "")
+                    Db::getInstance()->execute($query);
 
+        };
+
+        // Drop the payment method table
+        $drop_table($this->dbPmInfo);
+
+        // Drop the payment method raw data table
+        $drop_table($this->dbRawData);
+        
 		return true;
 	}
 
