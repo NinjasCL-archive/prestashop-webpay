@@ -258,13 +258,17 @@ class WebpayKcc extends PaymentModule {
 					. __PS_BASE_URI__
 					. "modules/{$this->name}/logo.png";
 
+		// For sending the form
+		$post_url =  Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']);
+
 		$this->context->smarty->assign(array(
 			'errors' => $this->_errors,
 			'data_kccPath' => $this->kccPath,
 			'data_kccURL' => $this->kccURL,
 			'data_kccLogPath' => $this->kccLogPath,
 			'version' => $this->version,
-			'img_header' => $img_header
+			'img_header' => $img_header,
+			'post_url' => $post_url
 		));
 
 		// Render the template
