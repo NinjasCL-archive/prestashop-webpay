@@ -198,6 +198,23 @@ class WebpayKcc extends PaymentModule {
 		// Do formatting
 		// Check that everything is OK
 		// This is done in /controllers/front/payment.php
+		//
+		// We will add a status flag
+		// inside the url so we can
+		// know where are we in the
+		// payment process.
+		//
+		// This is made in this hook
+		// so always we should have
+		// a status value set.
+		//
+		// The getValue function works like this
+		// 
+		// Tools::getValue($key, $defaultValue = false)
+		// Get a value from $_POST / $_GET. 
+		// If unavailable, take a default value.
+		
+		$status = Tools:getValue('status', 'OPEN');
 
 		// The smarty template engine
 		// will be used to render
@@ -205,8 +222,10 @@ class WebpayKcc extends PaymentModule {
 		//
 		// Assign the variables
 		// for use inside the template
+
+
 		$this->context->smarty->assign(array(
-		
+			'status' => $status
 		));
 
 		// Render the template
