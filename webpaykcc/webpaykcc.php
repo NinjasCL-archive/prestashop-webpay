@@ -197,6 +197,7 @@ class WebpayKcc extends PaymentModule {
 		// Get all the cart data
 		// Do formatting
 		// Check that everything is OK
+		// This is done in /controllers/front/payment.php
 
 		// The smarty template engine
 		// will be used to render
