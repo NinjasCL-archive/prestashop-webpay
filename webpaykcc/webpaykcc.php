@@ -175,8 +175,8 @@ class WebpayKcc extends PaymentModule {
 
 	public function getContent() {
 
-		// Get the active shop id if in multistore shop
-		$activeShopID = (int) Context::getContext()->shop()->id;
+        // Get active Shop ID for multistore shops
+        $activeShopID = (int) Context::getContext()->shop->id;
 
 		// Check if the update flag is present
 		// and process the input
