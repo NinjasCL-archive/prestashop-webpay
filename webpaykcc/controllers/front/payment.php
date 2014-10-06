@@ -101,7 +101,7 @@ class WebpayKccPaymentModuleFrontController
 			$module_url = "index.php?fc=module&module="
 						. "{$webpaykcc->name}&controller="
 						. "validate&cartId=" 
-						. $cartId;
+						. $order_id;
 
 
 			// Transbank will

@@ -6,7 +6,7 @@ include_once dirname(__FILE__) . '/constants.php';
 
 // Get the log path for a given
 // path and session id
-function getKCCLog($path, $session_Id) {
+function getKCCLog($path, $session_id) {
 	
 	$logPath = $path 
 			   . KCC_LOG_PREFIX
