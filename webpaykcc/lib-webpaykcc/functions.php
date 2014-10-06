@@ -15,3 +15,15 @@ function getKCCLog($path, $session_id) {
 
 	return $logPath;
 }
+
+// Get a Random UID
+// for Session Name
+// we use micro time to ensure
+// uniqueness
+function getSessionUID(){
+	// Random UID
+	return date("Y.m.d.h.i.s") 
+			. "_" 
+			. md5(microtime() 
+				. microtime());
+}

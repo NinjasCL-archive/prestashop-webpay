@@ -129,9 +129,7 @@ class WebpayKccPaymentModuleFrontController
 
 			// Session Id will be used 
 			// to generate the logs
-			// we use micro time to ensure
-			// uniqueness
-			$session_id = date("Ymdhis") . microtime();
+			$session_id = getSessionUID();
 
 			// Now create the log file
 			// Something like
