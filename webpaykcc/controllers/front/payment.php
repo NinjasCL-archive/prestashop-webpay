@@ -126,13 +126,55 @@ class WebpayKccPaymentModuleFrontController
 						. "modules/{$webpaykcc->name}"
 						. "/validate.php";
 
+			// Session Id will be used 
+			// to generate the logs
+			// we use micro time to ensure
+			// uniqueness
+			$session_id = date("Ymdhis") . microtime();
+
+			// Now create the log file
+			// Something like
+			// TBK_2014.10.05_224902_9293012312.log
+			// Inside the Log Folder
+			$tbk_log = fopen(getKCCLog($kccLogPath, $session_id), 'w+');
+
+			// We must format the amount
+			// to include 00 at the end
+			// this is needed for transbank
+			$tbk_total_amount = $total_amount . '00';
+
+			// This line is needed
+			// in order to verify
+			// the amount later in
+			// the callback page
+
+			$verification_line = "$tbk_total_amount;$order_id";
+
+			// Now we create the file
+
+			fwrite($tbk_log, $verification_line);
+
+			fclose($tbk_log);
+
+			// Action URL
+			// will be called in the form
+			// for sending the POST vars
+			// and begin transaction
+			$cgi_URL = $kccURL . KCC_CGI_NAME;
 
 			// Now we pass the data
 			// to smarty and render
 			// the template
 
 			$this->context->smarty->assign(array(
-
+				'action' => $cgi_URL,
+				'transaction_type' => KCC_TRANSACTION_TYPE,
+				'success_page' => $success_page,
+				'failure_page' => $failure_page,
+				'callback_page' => $callback_page,
+				'total_amount' => $tbk_total_amount,
+				'order_id' => $cartId,
+				'session_id' => $session_id
 			));
 
 			$this->setTemplate('confirmation.tpl');	
