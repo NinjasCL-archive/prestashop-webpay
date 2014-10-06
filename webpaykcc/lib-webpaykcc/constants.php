@@ -10,3 +10,8 @@ define('KCC_LOG', 'WEBPAY_KCC_LOGPATH');
 // Maybe Change it to something more 
 // configurable in the future
 define('KCC_TRANSACTION_TYPE', 'TR_NORMAL');
+
+// Useful Constants
+// This constant is used in log
+// generation
+define('KCC_LOG_PREFIX', 'TBK');
