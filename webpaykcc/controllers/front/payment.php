@@ -97,7 +97,7 @@ class WebpayKccPaymentModuleFrontController
 
  			// Base URL for success
 			// or failure pages
-			$module_url = . "index.php?fc=module&module="
+			$module_url = "index.php?fc=module&module="
 						. "{$webpaykcc->name}&controller="
 						. "validate&cartId=" 
 						. $cartId;
