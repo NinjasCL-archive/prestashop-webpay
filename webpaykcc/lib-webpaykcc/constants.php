@@ -5,3 +5,8 @@
 define('KCC_PATH', 'WEBPAY_KCC_PATH');
 define('KCC_URL', 'WEBPAY_KCC_URL');
 define('KCC_LOG', 'WEBPAY_KCC_LOGPATH');
+
+// Transaction Type
+// Maybe Change it to something more 
+// configurable in the future
+define('KCC_TRANSACTION_TYPE', 'TR_NORMAL');
