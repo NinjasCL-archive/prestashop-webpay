@@ -9,7 +9,7 @@
 
 <input type="hidden" name="TBK_TIPO_TRANSACCION" value="{$transaction_type}" />
 
-<input type="hidden" name="TBK_MONTO" value="{$total_amount}" />
+<input type="hidden" name="TBK_MONTO" value="{$tbk_total_amount}" />
 
 <input type="hidden" name="TBK_ORDEN_COMPRA" value="{$order_id}" />
 
@@ -21,6 +21,7 @@
 
 	<div class="row row-margin-bottom">
 		<div class="col-sm-6">
+			<img src="{$logo}">
 			{l s='You will be charged with the following amount' mod='webpaykcc'} ${$total_amount}
 		</div>
 		<div class="col-sm-6">

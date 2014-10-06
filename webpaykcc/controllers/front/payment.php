@@ -163,6 +163,11 @@ class WebpayKccPaymentModuleFrontController
 			// and begin transaction
 			$cgi_URL = $kccURL . KCC_CGI_NAME;
 
+			// Look for webpay logo
+			// inside the current folder
+			$logo = $base_url
+					. "modules/{$webpaykcc->name}/logo.png";
+
 			// Now we pass the data
 			// to smarty and render
 			// the template
@@ -176,7 +181,8 @@ class WebpayKccPaymentModuleFrontController
 				'total_amount' => $total_amount,
 				'tbk_total_amount' => $tbk_total_amount,
 				'order_id' => $order_id,
-				'session_id' => $session_id
+				'session_id' => $session_id,
+				'logo' => $logo
 			));
 
 			$this->setTemplate('confirmation.tpl');	
