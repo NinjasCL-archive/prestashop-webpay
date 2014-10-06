@@ -14,4 +14,4 @@ define('KCC_TRANSACTION_TYPE', 'TR_NORMAL');
 // Useful Constants
 // This constant is used in log
 // generation
-define('KCC_LOG_PREFIX', 'TBK');
+define('KCC_LOG_PREFIX', 'TBK_');
