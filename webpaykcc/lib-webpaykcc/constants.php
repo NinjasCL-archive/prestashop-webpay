@@ -15,3 +15,6 @@ define('KCC_TRANSACTION_TYPE', 'TR_NORMAL');
 // This constant is used in log
 // generation
 define('KCC_LOG_PREFIX', 'TBK_');
+
+// CGI File
+define('KCC_CGI_NAME', 'tbk_bp_pago.cgi');
