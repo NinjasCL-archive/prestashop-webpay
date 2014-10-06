@@ -69,7 +69,8 @@ class WebpayKccPaymentModuleFrontController
 
 	  		// Get cart data
 	  		$cart = $this->context->cart;
-	  		$cartId = self::$cart->id;
+	  		
+	  		$order_id = self::$cart->id;
 
 	  		// Get customer data
 	  		$customer = $this->context->customer;
@@ -174,7 +175,7 @@ class WebpayKccPaymentModuleFrontController
 				'callback_page' => $callback_page,
 				'total_amount' => $total_amount,
 				'tbk_total_amount' => $tbk_total_amount,
-				'order_id' => $cartId,
+				'order_id' => $order_id,
 				'session_id' => $session_id
 			));
 
