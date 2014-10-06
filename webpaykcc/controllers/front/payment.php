@@ -69,7 +69,7 @@ class WebpayKccPaymentModuleFrontController
 
 	  		// Get cart data
 	  		$cart = $this->context->cart;
-	  		$cartId self::$cart->id;
+	  		$cartId = self::$cart->id;
 
 	  		// Get customer data
 	  		$customer = $this->context->customer;
@@ -83,12 +83,12 @@ class WebpayKccPaymentModuleFrontController
 
 	  		// Round total amount
 	  		// of user cart
-			$total_amount = Tools:ps_round(
+			$total_amount = Tools::ps_round(
 							floatval(
 								$cart->getOrderTotal(
 									true, 
 									Cart::BOTH)
-								) 0);
+								), 0);
 
 			// Base URL
 			// for generating pages

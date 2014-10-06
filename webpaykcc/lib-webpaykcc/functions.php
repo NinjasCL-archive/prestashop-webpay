@@ -1,6 +1,6 @@
 <?php
 
-include_once './constants.php';
+include_once dirname(__FILE__) . '/constants.php';
 
 // Webpay Related Functions and Helpers
 
