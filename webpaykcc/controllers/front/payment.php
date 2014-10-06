@@ -172,7 +172,8 @@ class WebpayKccPaymentModuleFrontController
 				'success_page' => $success_page,
 				'failure_page' => $failure_page,
 				'callback_page' => $callback_page,
-				'total_amount' => $tbk_total_amount,
+				'total_amount' => $total_amount,
+				'tbk_total_amount' => $tbk_total_amount,
 				'order_id' => $cartId,
 				'session_id' => $session_id
 			));
