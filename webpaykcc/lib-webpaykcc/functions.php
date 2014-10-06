@@ -11,7 +11,7 @@ function getKCCLog($path, $session_id) {
 	$logPath = $path 
 			   . KCC_LOG_PREFIX
 		  	   . $session_id
-			   . 'log';
+			   . '.log';
 
 	return $logPath;
 }
