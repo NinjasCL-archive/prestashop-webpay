@@ -11,6 +11,12 @@ define('KCC_LOG', 'WEBPAY_KCC_LOGPATH');
 // configurable in the future
 define('KCC_TRANSACTION_TYPE', 'TR_NORMAL');
 
+// Use Exec
+// Eventually we could use
+// perl for not using php's exec
+// but for know this is just a dummy check
+define('KCC_USE_EXEC', true);
+
 // Useful Constants
 // This constant is used in log
 // generation
