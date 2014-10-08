@@ -18,3 +18,10 @@ define('KCC_LOG_PREFIX', 'TBK_');
 
 // CGI File
 define('KCC_CGI_NAME', 'tbk_bp_pago.cgi');
+
+// Responses
+define('KCC_ACCEPTED_RESULT', 'ACEPTADO');
+define('KCC_REJECTED_RESULT', 'RECHAZADO');
+
+// Webpay Responses
+define('KCC_OK_RESPONSE', 0);
