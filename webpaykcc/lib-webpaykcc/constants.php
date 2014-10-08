@@ -19,7 +19,7 @@ define('KCC_LOG_PREFIX', 'TBK_');
 // CGI File
 define('KCC_CGI_NAME', 'tbk_bp_pago.cgi');
 
-// Responses
+// Results
 define('KCC_ACCEPTED_RESULT', 'ACEPTADO');
 define('KCC_REJECTED_RESULT', 'RECHAZADO');
 
