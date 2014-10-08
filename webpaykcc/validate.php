@@ -117,6 +117,7 @@ class WebpayKccCallback {
 
 						// check kcc path
 						if(!(is_null($kccPath) || $kccPath == '')) {
+
 							// We must check with the cgi
 							// so we need to create a cache
 							// with all the $_POST params
@@ -134,8 +135,18 @@ class WebpayKccCallback {
 							}
 
 							fclose($tbk_cache);
+							
+							// Execute the CGI Check Script
+							if(KCC_USE_EXEC) {
+								
+								// Store the result in $tbk_result
+								exec($kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path ,$tbk_result);
 
-							exec($kccPath . ' ' . $tbk_cache_file, $tbk_result);
+
+							} else {
+								// Use perl
+								// TODO: Implement Perl Someday
+							}
 
 						} else {
 							$error_message = "Problem with KCC Path";

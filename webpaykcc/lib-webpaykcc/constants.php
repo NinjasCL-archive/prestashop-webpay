@@ -34,3 +34,5 @@ define('KCC_REJECTED_RESULT', 'RECHAZADO');
 
 // Webpay Responses
 define('KCC_OK_RESPONSE', 0);
+
+define('KCC_VERIFICATION_OK', 'CORRECTO');
