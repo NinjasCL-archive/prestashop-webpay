@@ -63,8 +63,6 @@ class WebpayKccCallback {
 		$response = $_POST['TBK_RESPUESTA'];
 		$tbk_total_amount = $_POST['TBK_MONTO'];
 
-		// Default Result
-		$result = KCC_REJECTED_RESULT;
 
 		// Get the log files
 		$tbk_log_path = null;
@@ -79,7 +77,7 @@ class WebpayKccCallback {
 			$tbk_log_path = getKccLog($kccLogPath, $session_id);
 
 			// The cache file is needed for validation
-			$tbk_cache_path = $tbk_log . '.cache';
+			$tbk_cache_path = $tbk_log_path . '.cache';
 
 			// Get cart data
 			$order = new Order(Order::getOrderByCartId($order_id));
@@ -88,11 +86,21 @@ class WebpayKccCallback {
 		}
 
 
-		// Start Verification Process
+		// Default Values
+		$result = KCC_REJECTED_RESULT;
+
 		$error_message = "Unknown Error for Response $reponse";
 
+		// Helper closure
+		$getOrderTotalAmount = function($cart) {
+    		$order_total = Tools::ps_round(floatval($cart->getOrderTotal(true, Cart::BOTH)), 0);
+    		return $order_total;
+		};
+
+		// Start Verification Process
+
 		// Response must be OK
-		if(!is_null($response) && $response == KCC_OK_RESPONSE){
+		if(!is_null($response) && $response == KCC_OK_RESPONSE) {
 
 			// Cart and Order must exist
 			if(isset($order->id) && isset($cart->id)) {
@@ -103,7 +111,7 @@ class WebpayKccCallback {
 					// Open the log file
 					$tbk_log = fopen($tbk_log_path, 'r');
 
-					// put everything inside in a string
+					// Put everything inside in a string
 					$tbk_log_string = fgets($tbk_log);
 
 					fclose($tbk_log);
@@ -112,10 +120,10 @@ class WebpayKccCallback {
 					// separated by semicolon
 					$tbk_details = explode(';', $tbk_log_string);
 
-					// detail count must be > 0
+					// Detail count must be > 0
 					if (isset($tbk_details) && count($tbk_details) >= 1) {
 
-						// check kcc path
+						// Check kcc path
 						if(!(is_null($kccPath) || $kccPath == '')) {
 
 							// We must check with the cgi
@@ -140,13 +148,57 @@ class WebpayKccCallback {
 							if(KCC_USE_EXEC) {
 								
 								// Store the result in $tbk_result
-								exec($kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path ,$tbk_result);
+								// executing the script with the log cache file
+								// as param
+
+								$command = $kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path;
+
+								exec($command , $tbk_result);
 
 
 							} else {
 								// Use perl
 								// TODO: Implement Perl Someday
 							}
+
+							// Check the result
+							if (isset($tbk_result[0]) && $tbk_result[0] == KCC_VERIFICATION_OK) {
+								
+
+								// Check Order
+								if(isset($order->id) && 
+								   $order_id == $tbk_order_id &&
+								   $order->id == $tbk_order_id) {
+									
+									// Check Amount
+									
+									$order_amount = $getOrderTotalAmount($cart);
+
+									// Needed 00 at the end
+									$tbk_order_amount = $order_amount . '00';
+
+									if(isset($tbk_total) && 
+									   isset($tbk_total_amount) &&
+									   $tbk_total == $tbk_order_amount &&
+									   $tbk_total == $tbk_total_amount &&
+									   $tbk_total_amount == $tbk_order_amount) {
+
+										// Everything is OK
+										$result = KCC_ACCEPTED;
+										$error_message = null;
+
+									} else {
+										$error_message = "Wrong Total $tbk_total != $tbk_order_amount";
+									}
+
+								} else {
+									$error_message = "Wrong Order Id $tbk_order_id != $order_id";
+								}
+
+							} else {
+								$error_message = "Verification failure " . print_r($tbk_result, true);
+							}
+							
 
 						} else {
 							$error_message = "Problem with KCC Path";
@@ -164,15 +216,79 @@ class WebpayKccCallback {
 				$error_message = "Cart does not exist for id $order_id";
 			}
 
-		} else {
+		} else if(isset($response)){
+
 			// Response Wasn't OK
 			$error_message = "Response Not OK, Response : $response";
+
+			// Result must be Accepted
+			// if there is a response 
+			// but is not OK
+
+			$result = KCC_ACCEPTED;
+		} 
+
+
+
+		// Update Cart Status
+		// if Cart Exists
+
+		/*
+			http://doc.prestashop.com/display/PS16/Creating+a+payment+module
+			Validating the payment
+			In order to register the payment validation, you must use the validateOrder() method from the PaymentModule class, using the following parameters:
+			(integer) id_cart: the ID of the cart to validate.
+			(integer) id_order_state: the ID of the order status (Awiting payment, Payment accepted, Payment error, etc.).
+			(float) amount_paid: the amount that the client actually paid.
+			(string) payment_method: the name of the payment method.
+
+			function validateOrder($id_cart, $id_order_state, $amountPaid, $paymentMethod = 'Unknown', $message = NULL, $extraVars = array(), $currency_special = NULL)
+		*/
+
+		if($cart) {
+
+			// Get order data
+			$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
+	    	
+	    	$order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
+
+	    	$order_status = $order_status_failed;
+
+	    	$order_total = $getOrderTotalAmount($cart);
+
+			if(isset($response) && 
+			   $response == KCC_OK_RESPONSE && 
+			   $result == KCC_ACCEPTED &&
+			   is_null($error_message)) {
+
+				// Set Order as Paid
+
+				$order_status = $order_status_completed;
+
+			}
+
+			// Save Cart
+
+			$webpayKcc = new WebpayKcc();
+
+			$webpayKcc->validateOrder($cart->id, 
+									  $order_status,
+									  $order_total, 
+									  "WEBPAYKCC", 
+									   null, 
+									   array(), 
+									   null, 
+									   false, 
+									   $cart->secure_key
+									 );
+
 		}
 
 		// Register Error in Log if present
-		if($response != KCC_OK_RESPONSE) {
-			// TODO: Register Error
+		if(!is_null($error_message)) {
+				// TODO: Register Error
 		}
+
 
 		echo $result;
 	}
