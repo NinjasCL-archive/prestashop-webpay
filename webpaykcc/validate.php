@@ -88,6 +88,8 @@ class WebpayKccCallback {
 			$tbk_cache_path = $tbk_log_path . '.cache';
 
 			// Get cart data
+			// $order_id is set in /controllers/front/payment.php
+			// as the current cart id
 			$order = new Order(Order::getOrderByCartId($order_id));
 
   			$cart = Cart::getCartByOrderId($order->id);
