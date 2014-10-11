@@ -114,17 +114,6 @@ class WebpayKcc extends PaymentModule {
 	// clean all the data
 	// and remove the module
 	public function uninstall() {
-		
-		// Clean all data
-		// after the parent 
-		// uninstall
-		if(!Configuration::deleteByName(KCC_PATH)
-				|| !Configuration::deleteByName(KCC_URL)
-				|| !Configuration::deleteByName(KCC_LOG)
-				|| !parent::uninstall()
-			)
-
-				return false;
 
         // Drop table Closure
         $drop_table = function($table_name) {
@@ -135,6 +124,18 @@ class WebpayKcc extends PaymentModule {
                     Db::getInstance()->execute($query);
 
         };
+
+		// Clean all data
+		// after the parent 
+		// uninstall
+		if(!Configuration::deleteByName(KCC_PATH)
+				|| !Configuration::deleteByName(KCC_URL)
+				|| !Configuration::deleteByName(KCC_LOG)
+				|| !(Configuration::deleteByName(KCC_WAITING_PAYMENT_STATE)
+				|| !parent::uninstall()
+			)
+
+				return false;
 
         // Drop the payment method table
         $drop_table($this->dbPmInfo);
