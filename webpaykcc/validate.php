@@ -77,7 +77,17 @@ class WebpayKccCallback {
 		$kccPath = Configuration::get(KCC_PATH);
 		$kccLogPath = Configuration::get(KCC_LOG);
 
+		
+		// Default Values
+		$result = KCC_REJECTED_RESULT;
+
+		$error_message = "Unknown Error";
+
 		$cart = null;
+
+
+		// Set the log paths
+		// and cart and order vars
 
 		if(!is_null($order_id) && !is_null($session_id)) {
 
@@ -90,16 +100,17 @@ class WebpayKccCallback {
 			// Get cart data
 			// $order_id is set in /controllers/front/payment.php
 			// as the current cart id
-			$order = new Order(Order::getOrderByCartId($order_id));
+			try {
 
-  			$cart = Cart::getCartByOrderId($order->id);
+				$order = new Order(Order::getOrderByCartId($order_id));
+
+  				$cart = Cart::getCartByOrderId($order->id);
+
+  			catch(Exception $e) {
+  				$error_message = $e->getMessage();
+  			}
 		}
 
-
-		// Default Values
-		$result = KCC_REJECTED_RESULT;
-
-		$error_message = "Unknown Error";
 
 		// Check for params
 		if (is_null($session_id) ||
@@ -311,16 +322,18 @@ class WebpayKccCallback {
 			$webpayKcc = new WebpayKcc();
 
 			try {
-				$webpayKcc->validateOrder($cart->id, 
-									  $order_status,
-									  $order_total, 
-									  "WEBPAYKCC", 
-									   null, 
-									   array(), 
-									   null, 
-									   false, 
-									   $cart->secure_key
-									 );
+				
+        		$webpayKcc->validateOrder(
+	        		(int)self::$cart->id, 
+	        		$order_status, 
+	        		(float)self::$cart->getOrderTotal(), 
+	        		$webpayKcc->displayName, 
+	        		NULL, 
+	        		array(), 
+	        		NULL, 
+	        		false, 
+	        		self::$cart->secure_key
+        		);
 
 		   } catch (Exception $e) {
 		   	 $error_message = $e->getMessage();

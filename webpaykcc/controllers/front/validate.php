@@ -5,8 +5,8 @@
 class WebpayKccValidateModuleFrontController 
 extends ModuleFrontController {
 
-	public function initContent()
-    {
+	public function initContent() {
+
         $this->display_column_left = false;
         $this->display_column_right = false;
 
@@ -15,11 +15,14 @@ extends ModuleFrontController {
        	$this->handleGET();
     }
 
-    private function handleGET()
-    {
+    private function handleGET() {
+
         $cartId = $_GET['cartId'];
+        
         $order = new Order(Order::getOrderByCartId($cartId));
+
         $customer = $order->getCustomer();
+
         $modID = Module::getInstanceByName($order->module);
 
         if ($_GET['return'] == 'error') {
@@ -29,4 +32,4 @@ extends ModuleFrontController {
            
         }
     }
-}}
+}
