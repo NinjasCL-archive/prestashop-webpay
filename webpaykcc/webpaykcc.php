@@ -118,8 +118,13 @@ class WebpayKcc extends PaymentModule {
 		// Clean all data
 		// after the parent 
 		// uninstall
-		if(!parent::uninstall())
-			return false;
+		if(!Configuration::deleteByName(KCC_PATH)
+				|| !Configuration::deleteByName(KCC_URL)
+				|| !Configuration::deleteByName(KCC_LOG)
+				|| !parent::uninstall()
+			)
+
+				return false;
 
         // Drop table Closure
         $drop_table = function($table_name) {
@@ -155,7 +160,9 @@ class WebpayKcc extends PaymentModule {
             // as Open 
             
             $orderState = new OrderState(null, Configuration::get('PS_LANG_DEFAULT'));
-            $orderState->name = "Awaiting payment";
+            
+            $orderState->name = $this->l("Awaiting Webpay KCC Payment");
+
             $orderState->invoice = false;
            
             $orderState->send_email = true;

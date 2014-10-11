@@ -120,7 +120,7 @@ class WebpayKccPaymentModuleFrontController
 			$module_url = "index.php?fc=module&module="
 						. "{$webpaykcc->name}&controller="
 						. "validate&cartId=" 
-						. $order_id;
+						. $cart_id;
 
 
 			// Transbank will
@@ -166,7 +166,7 @@ class WebpayKccPaymentModuleFrontController
 			// the amount later in
 			// the callback page
 
-			$verification_line = "$tbk_total_amount;$order_id";
+			$verification_line = "$tbk_total_amount;$cart_id";
 
 			// Now we create the file
 
