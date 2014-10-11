@@ -116,7 +116,14 @@ class WebpayKccCallback {
 
 		// Helper closure
 		$getOrderTotalAmount = function($cart) {
-    		$order_total = Tools::ps_round(floatval($cart->getOrderTotal(true, Cart::BOTH)), 0);
+			
+			$order_total = 0;
+
+			if($cart) {
+    			$order_total = Tools::ps_round(floatval(
+    						   $cart->getOrderTotal(true, Cart::BOTH)), 0);
+    		}
+
     		return $order_total;
 		};
 
@@ -248,7 +255,7 @@ class WebpayKccCallback {
 			// if there is a response 
 			// but is not OK
 
-			$result = KCC_ACCEPTED;
+			$result = KCC_ACCEPTED_RESULT;
 		} 
 
 
@@ -281,7 +288,7 @@ class WebpayKccCallback {
 
 			if(isset($response) && 
 			   $response == KCC_OK_RESPONSE && 
-			   $result == KCC_ACCEPTED &&
+			   $result == KCC_ACCEPTED_RESULT &&
 			   is_null($error_message)) {
 
 				// Set Order as Paid
