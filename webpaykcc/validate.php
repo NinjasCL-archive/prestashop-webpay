@@ -314,7 +314,7 @@ class WebpayKccCallback {
 
 			$error_log = fopen($error_log_path, 'w+');
 
-			fwrite($error_log, date() . " ; Error: $error_message\n");
+			fwrite($error_log, date('Y-m-d H:i:s') . " ; Error: $error_message\n");
 							
 			fclose($error_log);
 
