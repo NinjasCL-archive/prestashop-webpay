@@ -266,16 +266,21 @@ class WebpayKccCallback {
 		/*
 			http://doc.prestashop.com/display/PS16/Creating+a+payment+module
 			Validating the payment
-			In order to register the payment validation, you must use the validateOrder() method from the PaymentModule class, using the following parameters:
+			In order to register the payment validation, you must use the 
+			validateOrder() method from the PaymentModule class, using the 
+			following parameters:
 			(integer) id_cart: the ID of the cart to validate.
-			(integer) id_order_state: the ID of the order status (Awiting payment, Payment accepted, Payment error, etc.).
+			(integer) id_order_state: the ID of the order status (Awiting payment,
+			 Payment accepted, Payment error, etc.).
 			(float) amount_paid: the amount that the client actually paid.
 			(string) payment_method: the name of the payment method.
 
-			function validateOrder($id_cart, $id_order_state, $amountPaid, $paymentMethod = 'Unknown', $message = NULL, $extraVars = array(), $currency_special = NULL)
+			function validateOrder($id_cart, $id_order_state, $amountPaid, 
+			$paymentMethod = 'Unknown', $message = NULL, $extraVars = array(), 
+			$currency_special = NULL)
 		*/
 
-		if(isset($cart)) {
+		if(isset($cart) && is_object($cart)) {
 
 			// Get order data
 			$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
@@ -301,7 +306,8 @@ class WebpayKccCallback {
 
 			$webpayKcc = new WebpayKcc();
 
-			$webpayKcc->validateOrder($cart->id, 
+			try {
+				$webpayKcc->validateOrder($cart->id, 
 									  $order_status,
 									  $order_total, 
 									  "WEBPAYKCC", 
@@ -311,6 +317,10 @@ class WebpayKccCallback {
 									   false, 
 									   $cart->secure_key
 									 );
+
+		   } catch (Exception $e) {
+		   	 $error_message = $e->getMessage();
+		   }
 
 		}
 
@@ -334,7 +344,7 @@ class WebpayKccCallback {
 
 		}
 
-
+		// Send transbank the result
 		echo $result;
 	}
 }
