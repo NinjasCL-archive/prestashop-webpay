@@ -106,7 +106,7 @@ class WebpayKccCallback {
 
   				$cart = Cart::getCartByOrderId($order->id);
 
-  			catch(Exception $e) {
+  			} catch(Exception $e) {
   				$error_message = $e->getMessage();
   			}
 		}
@@ -322,7 +322,7 @@ class WebpayKccCallback {
 			$webpayKcc = new WebpayKcc();
 
 			try {
-				
+
         		$webpayKcc->validateOrder(
 	        		(int)self::$cart->id, 
 	        		$order_status, 
