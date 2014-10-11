@@ -70,7 +70,26 @@ class WebpayKccPaymentModuleFrontController
 	  		// Get cart data
 	  		$cart = $this->context->cart;
 	  		
-	  		$order_id = self::$cart->id;
+
+	  		// Create a new Order for the Cart
+	  		// This order will be procesed
+	  		// by webpaykcc/validate.php
+	  		// and set the status for the payment
+        	$webpayKcc = new WebpayKcc();
+
+        	$webpayKcc->validateOrder(
+        		(int)self::$cart->id, 
+        		(int)Configuration::get(KCC_WAITING_PAYMENT_STATE), 
+        		(float)self::$cart->getOrderTotal(), 
+        		$webpayKcc->displayName, 
+        		NULL, 
+        		array(), 
+        		NULL, 
+        		false, 
+        		self::$cart->secure_key
+        		);
+
+	  		$cart_id = self::$cart->id;
 
 	  		// Get customer data
 	  		$customer = $this->context->customer;
@@ -178,7 +197,7 @@ class WebpayKccPaymentModuleFrontController
 				'callback_page' => $callback_page,
 				'total_amount' => $total_amount,
 				'tbk_total_amount' => $tbk_total_amount,
-				'order_id' => $order_id,
+				'order_id' => $cart_id,
 				'session_id' => $session_id,
 				'logo' => $logo
 			));

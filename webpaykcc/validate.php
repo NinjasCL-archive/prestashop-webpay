@@ -245,9 +245,9 @@ class WebpayKccCallback {
 				}
 
 			} else {
-				$error_message = "Cart does not exist for id $order_id\n";
-				$error_message .= print_r($order, true);
-				$error_message .= print_r($cart, true);
+				$error_message = "Order does not exist for Cart id $order_id\n";
+				// $error_message .= print_r($order, true);
+				// $error_message .= print_r($cart, true);
 			}
 
 		} else if(isset($response)){

@@ -103,6 +103,9 @@ class WebpayKcc extends PaymentModule {
 			!$this->registerHook('paymentReturn'))
 			return false;
 
+		// Create Order States
+		$this->addOrderStates();
+
 		// All is good
 		return true;
 	}
@@ -137,6 +140,55 @@ class WebpayKcc extends PaymentModule {
 		return true;
 	}
 
+	// This function creates the states
+	// for the order. Needed for
+	// order creation and updates.
+
+	private function addOrderStates() {
+
+		// Create a new Order state if not already done
+
+        if (!(Configuration::get(KCC_WAITING_PAYMENT_STATE) > 0)) {
+
+            // Create a new state
+            // and set the state
+            // as Open 
+            
+            $orderState = new OrderState(null, Configuration::get('PS_LANG_DEFAULT'));
+            $orderState->name = "Awaiting payment";
+            $orderState->invoice = false;
+           
+            $orderState->send_email = true;
+            $orderState->module_name = $this->name;
+            $orderState->color = "RoyalBlue";
+           
+            $orderState->unremovable = true;
+            $orderState->hidden = false;
+           
+            $orderState->logable = false;
+            $orderState->delivery = false;
+           
+            $orderState->shipped = false;
+            $orderState->paid = false;
+           
+            $orderState->deleted = false;
+           
+            $orderState->template = "order_changed";
+            $orderState->add();
+            
+            // The the value
+            // in the configuration database
+            Configuration::updateValue(KCC_WAITING_PAYMENT_STATE, $orderState->id);
+            
+            // Create an icon
+            if (file_exists(dirname(dirname(dirname(__file__))) . '/img/os/10.gif'))
+                copy(dirname(dirname(dirname(__file__))) 
+                . '/img/os/10.gif', dirname(dirname(dirname(__file__)))
+                . '/img/os/'.$orderState->id.'.gif');
+        }
+
+    }
+	
 	// This function is called when
 	// the user reach the payment
 	// selection screen
