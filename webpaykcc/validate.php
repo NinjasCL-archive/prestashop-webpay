@@ -52,6 +52,12 @@ include_once (_PS_MODULE_DIR_ . 'webpaykcc/webpaykcc.php');
 class WebpayKccCallback {
 
 	public function init() {
+		define('_PS_ADMIN_DIR_', getcwd());
+
+        // Load Presta Configuration
+        Configuration::loadConfiguration();
+        Context::getContext()->link = new Link();
+
 		$this->confirm();
 	}
 
@@ -227,7 +233,7 @@ class WebpayKccCallback {
 									   $tbk_total_amount == $tbk_order_amount) {
 
 										// Everything is OK
-										$result = KCC_ACCEPTED;
+										$result = KCC_ACCEPTED_RESULT;
 										$error_message = null;
 
 									} else {
@@ -285,7 +291,7 @@ class WebpayKccCallback {
 			validateOrder() method from the PaymentModule class, using the 
 			following parameters:
 			(integer) id_cart: the ID of the cart to validate.
-			(integer) id_order_state: the ID of the order status (Awiting payment,
+			(integer) id_order_state: the ID of the order status (Awaiting payment,
 			 Payment accepted, Payment error, etc.).
 			(float) amount_paid: the amount that the client actually paid.
 			(string) payment_method: the name of the payment method.
@@ -320,24 +326,19 @@ class WebpayKccCallback {
 
 			try {
 
-				// Save Cart
+				// Change Order State
+				if(isset($order) && is_object($order)) {
 
-				$webpayKcc = new WebpayKcc();
+					$order->setCurrentState($order_status);
 
-        		$webpayKcc->validateOrder(
-	        		(int)$cart->id, 
-	        		$order_status, 
-	        		(double)$cart->getOrderTotal(), 
-	        		$webpayKcc->displayName, 
-	        		NULL, 
-	        		array(), 
-	        		NULL, 
-	        		false, 
-	        		$cart->secure_key
-        		);
+				} else {
+					$result = KCC_REJECTED_RESULT;
+					$error_message .= "\nFailed to change order state";
+				}
 
 		   } catch (Exception $e) {
-		   	 $error_message = $e->getMessage();
+		   	 $error_message .= $e->getMessage();
+		   	 $result = KCC_REJECTED_RESULT;
 		   }
 
 		}

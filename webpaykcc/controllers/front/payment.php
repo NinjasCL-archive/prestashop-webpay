@@ -78,9 +78,9 @@ class WebpayKccPaymentModuleFrontController
         	$webpayKcc = new WebpayKcc();
 
         	$webpayKcc->validateOrder(
-        		(int)self::$cart->id, 
+        		(int) self::$cart->id, 
         		(int)Configuration::get(KCC_WAITING_PAYMENT_STATE), 
-        		(float)self::$cart->getOrderTotal(), 
+        		(float) self::$cart->getOrderTotal(), 
         		$webpayKcc->displayName, 
         		NULL, 
         		array(), 
