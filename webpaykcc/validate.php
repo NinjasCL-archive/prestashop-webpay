@@ -243,7 +243,9 @@ class WebpayKccCallback {
 				}
 
 			} else {
-				$error_message = "Cart does not exist for id $order_id";
+				$error_message = "Cart does not exist for id $order_id\n";
+				$error_message .= print_r($order, true);
+				$error_message .= print_r($cart, true);
 			}
 
 		} else if(isset($response)){
@@ -338,7 +340,11 @@ class WebpayKccCallback {
 
 			$error_log = fopen($error_log_path, 'a');
 
-			fwrite($error_log, date('Y-m-d H:i:s') . "  Error: $error_message\n");
+			$text = date('Y-m-d H:i:s') . "  Error: $error_message\n";
+
+			$text .= "#########################################\n";
+
+			fwrite($error_log, $text);
 							
 			fclose($error_log);
 
