@@ -218,7 +218,7 @@ class WebpayKccCallback {
 
 								if(isset($order->id) && 
 								   trim($order_id) == trim($tbk_order_id) &&
-								   trim($order->id) == trim($tbk_order_id)) {
+								   trim($cart->id) == trim($tbk_order_id)) {
 									
 									// Check Amount
 									
@@ -242,8 +242,8 @@ class WebpayKccCallback {
 									}
 
 								} else {
-									$error_message = "order_id $order_id tbk_order_id $tbk_order_id order->id $order->id\n";
-									$error_message .= "Wrong Order Id $tbk_order_id != $order_id\n" . print_r($order, true);
+									$error_message = "Wrong Order Id $tbk_order_id != $order_id\n";
+									$error_message .= "order_id $order_id tbk_order_id $tbk_order_id cart->id $order->id\n" . print_r($order, true);
 								}
 
 							} else {
