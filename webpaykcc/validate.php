@@ -310,11 +310,18 @@ class WebpayKccCallback {
 		// Register Error in Log if present
 		if(!is_null($error_message)) {
 			
-			$error_log_path = KCC_LOG . 'payment.errors.log';
+			$path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
 
-			$error_log = fopen($error_log_path, 'w+');
+			if($kccLogPath){
+				$path = $kccLogPath;
+			}
 
-			fwrite($error_log, date('Y-m-d H:i:s') . " ; Error: $error_message\n");
+
+			$error_log_path = $path . 'payment.errors.log';
+
+			$error_log = fopen($error_log_path, 'a');
+
+			fwrite($error_log, date('Y-m-d H:i:s') . "  Error: $error_message\n");
 							
 			fclose($error_log);
 
