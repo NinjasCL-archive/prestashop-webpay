@@ -58,10 +58,16 @@ class WebpayKccCallback {
 	public function confirm() {
 		
 		// Get Webpay Post Data
-		$session_id = $_POST['TBK_ID_SESION'];
-		$order_id = $_POST['TBK_ORDEN_COMPRA'];
-		$response = $_POST['TBK_RESPUESTA'];
-		$tbk_total_amount = $_POST['TBK_MONTO'];
+
+		// Check if the Post Data exists
+
+		$session_id = (isset($_POST['TBK_ID_SESION']) ? $_POST['TBK_ID_SESION'] : null);
+
+		$order_id = (isset($_POST['TBK_ORDEN_COMPRA']) ? $_POST['TBK_ORDEN_COMPRA'] : null);
+
+		$response = (isset($_POST['TBK_RESPUESTA']) ? $_POST['TBK_RESPUESTA'] : null);
+		
+		$tbk_total_amount = (isset($_POST['TBK_MONTO']) ? $_POST['TBK_MONTO'] : null);
 
 
 		// Get the log files
@@ -70,6 +76,8 @@ class WebpayKccCallback {
 
 		$kccPath = Configuration::get(KCC_PATH);
 		$kccLogPath = Configuration::get(KCC_LOG);
+
+		$cart = null;
 
 		if(!is_null($order_id) && !is_null($session_id)) {
 
@@ -89,7 +97,22 @@ class WebpayKccCallback {
 		// Default Values
 		$result = KCC_REJECTED_RESULT;
 
-		$error_message = "Unknown Error for Response $reponse";
+		$error_message = "Unknown Error";
+
+		// Check for params
+		if (is_null($session_id) ||
+			is_null($order_id) ||
+			is_null($response)  ||
+			is_null($tbk_total_amount)
+			) {
+
+			$error_message = "Params Not Found\n";
+
+			foreach ($_POST as $key => $value) {
+				$error_message .= "$key => $value \n";
+			}
+
+		}
 
 		// Helper closure
 		$getOrderTotalAmount = function($cart) {
@@ -245,7 +268,7 @@ class WebpayKccCallback {
 			function validateOrder($id_cart, $id_order_state, $amountPaid, $paymentMethod = 'Unknown', $message = NULL, $extraVars = array(), $currency_special = NULL)
 		*/
 
-		if($cart) {
+		if(isset($cart)) {
 
 			// Get order data
 			$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
@@ -286,7 +309,15 @@ class WebpayKccCallback {
 
 		// Register Error in Log if present
 		if(!is_null($error_message)) {
-				// TODO: Register Error
+			
+			$error_log_path = KCC_LOG . 'payment.errors.log';
+
+			$error_log = fopen($error_log_path, 'w+');
+
+			fwrite($error_log, date() . " ; Error: $error_message\n");
+							
+			fclose($error_log);
+
 		}
 
 
