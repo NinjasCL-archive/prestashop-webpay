@@ -131,7 +131,7 @@ class WebpayKcc extends PaymentModule {
 		if(!Configuration::deleteByName(KCC_PATH)
 				|| !Configuration::deleteByName(KCC_URL)
 				|| !Configuration::deleteByName(KCC_LOG)
-				|| !(Configuration::deleteByName(KCC_WAITING_PAYMENT_STATE)
+				|| !Configuration::deleteByName(KCC_WAITING_PAYMENT_STATE)
 				|| !parent::uninstall()
 			)
 
