@@ -317,22 +317,23 @@ class WebpayKccCallback {
 
 			}
 
-			// Save Cart
-
-			$webpayKcc = new WebpayKcc();
 
 			try {
 
+				// Save Cart
+
+				$webpayKcc = new WebpayKcc();
+
         		$webpayKcc->validateOrder(
-	        		(int)self::$cart->id, 
+	        		(int)$cart->id, 
 	        		$order_status, 
-	        		(float)self::$cart->getOrderTotal(), 
+	        		(double)$cart->getOrderTotal(), 
 	        		$webpayKcc->displayName, 
 	        		NULL, 
 	        		array(), 
 	        		NULL, 
 	        		false, 
-	        		self::$cart->secure_key
+	        		$cart->secure_key
         		);
 
 		   } catch (Exception $e) {
