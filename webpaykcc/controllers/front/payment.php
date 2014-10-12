@@ -77,6 +77,23 @@ class WebpayKccPaymentModuleFrontController
 	  		// and set the status for the payment
         	$webpayKcc = new WebpayKcc();
 
+			/*
+				http://doc.prestashop.com/display/PS16/Creating+a+payment+module
+				Validating the payment
+				In order to register the payment validation, you must use the 
+				validateOrder() method from the PaymentModule class, using the 
+				following parameters:
+				(integer) id_cart: the ID of the cart to validate.
+				(integer) id_order_state: the ID of the order status (Awaiting payment,
+				 Payment accepted, Payment error, etc.).
+				(float) amount_paid: the amount that the client actually paid.
+				(string) payment_method: the name of the payment method.
+
+				function validateOrder($id_cart, $id_order_state, $amountPaid, 
+				$paymentMethod = 'Unknown', $message = NULL, $extraVars = array(), 
+				$currency_special = NULL)
+			*/
+
         	$webpayKcc->validateOrder(
         		(int) self::$cart->id, 
         		(int)Configuration::get(KCC_WAITING_PAYMENT_STATE), 
