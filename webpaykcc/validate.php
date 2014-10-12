@@ -297,6 +297,8 @@ class WebpayKccCallback {
 
 	    	$order_total = $getOrderTotalAmount($cart);
 
+	    	$order_waiting_payment = (int) Configuration::get(KCC_WAITING_PAYMENT_STATE);
+
 			if(isset($response) && 
 			   $response == KCC_OK_RESPONSE && 
 			   $result == KCC_ACCEPTED_RESULT &&
@@ -313,8 +315,18 @@ class WebpayKccCallback {
 
 				// Change Order State
 				if(isset($order) && is_object($order)) {
+					
+					// Only change the state if is waiting payment
+					if($order->current_state == $order_waiting_payment) {
+						
+						$order->setCurrentState($order_status);
 
-					$order->setCurrentState($order_status);
+					} else {
+						
+						$result = KCC_REJECTED_RESULT;
+						$error_message .= "\n Order State is not Waiting Payment";
+
+					}
 
 				} else {
 					$result = KCC_REJECTED_RESULT;
