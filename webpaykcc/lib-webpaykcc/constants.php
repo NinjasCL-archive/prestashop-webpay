@@ -6,6 +6,9 @@ define('KCC_PATH', 'WEBPAY_KCC_PATH');
 define('KCC_URL', 'WEBPAY_KCC_URL');
 define('KCC_LOG', 'WEBPAY_KCC_LOGPATH');
 
+// Url for the Terms and Conditions
+define('KCC_TOC_PAGE_URL', 'WEBPAY_KCC_TOC_PAGE_URL');
+
 // Transaction Type
 // Maybe Change it to something more 
 // configurable in the future
