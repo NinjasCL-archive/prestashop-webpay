@@ -49,12 +49,32 @@ extends ModuleFrontController {
 	// This var holds the error message
 	protected $error_message = null;
 
+	// webpay logo path
+	protected $logo = null;
+
+	// Constructor
+	public function __construct() {
+
+	  		parent::__construct();
+
+	  		// Hide columns
+	  		$this->display_column_left = false;
+        	$this->display_column_right = false;
+	}
+
+
 	public function initContent() {
 
-        $this->display_column_left = false;
-        $this->display_column_right = false;
-
        	parent::initContent();
+
+		// Look for webpay logo
+		// inside the current folder
+		$base_url = Tools::getShopDomainSsl(true, true);
+
+		$name = $this->module->name;
+
+		$this->logo = $base_url
+				. "/modules/{$name}/logo.png";
 
        	$this->handleGET();
     }
@@ -106,7 +126,7 @@ extends ModuleFrontController {
 		$cart = null;
 		$order = null;
 		$customer = null;
-		$webpaykcc = null;
+		$webpaykcc = new WebpayKcc();
 
 		// Error vars
 		$error = false;
@@ -299,38 +319,38 @@ extends ModuleFrontController {
 			// Do some formatting for the payment type
 			if ($tbk_payment_type[1] == 'VD') {
 
-				$params['tbk_payment_type'] = $this->l('Redcompra');
+				$params['tbk_payment_type'] = $this->module->l('Redcompra');
 
 			} else {
 
-				$params['tbk_payment_type'] = $this->l("Crédito");
+				$params['tbk_payment_type'] = $this->module->l("Crédito");
 
 			}
 
 			// Do some formatting for the Installment Type
 			if ($tbk_payment_type[1] == 'VN') {
 				
-				$params['tbk_installment_type'] = $this->l('Sin cuotas');
+				$params['tbk_installment_type'] = $this->module->l('Sin cuotas');
 
 			} else if ($tbk_payment_type[1] == 'VC') {
 
-				$params['tbk_installment_type'] = $this->l('Cuotas normales');
+				$params['tbk_installment_type'] = $this->module->l('Cuotas normales');
 
 			} else if ($tbk_payment_type[1] == 'SI') {
 
-				$params['tbk_installment_type'] = $this->l('Sin interés');
+				$params['tbk_installment_type'] = $this->module->l('Sin interés');
 
 			} else if ($tbk_payment_type[1] == 'S2') {
 
-				$params['tbk_installment_type'] = $this->l('Dos cuotas sin interés');
+				$params['tbk_installment_type'] = $this->module->l('Dos cuotas sin interés');
 
 			} else if ($tbk_payment_type[1] == 'CI') {
 
-				$params['tbk_installment_type'] = $this->l('Cuotas comercio');
+				$params['tbk_installment_type'] = $this->module->l('Cuotas comercio');
 
 			} else if ($tbk_payment_type[1] == 'VD') {
 
-				$params['tbk_installment_type'] = $this->l('Débido');
+				$params['tbk_installment_type'] = $this->module->l('Débito');
 
 			}
 
@@ -347,31 +367,21 @@ extends ModuleFrontController {
 			}
 
 
-			// Helper closure
-			// $getOrderTotalAmount = function($cart) {
-				
-			// 	$order_total = 0;
-
-			// 	if($cart) {
-	  //   			$order_total = Tools::ps_round(floatval(
-	  //   						   $cart->getOrderTotal(true, Cart::BOTH)), 0);
-	  //   		}
-
-	  //   		return $order_total;
-			// };
-
 
 			// Add more info to params
 
 			// General Info
+			$base_url = Tools::getShopDomainSsl(true, true);
 
 			$params['toc_page'] = $kccTocPage;
 
-			$params['shop_name'] = $this->config->get('config_name');
+			$params['order_history'] = $base_url . '/index.php?controller=history';
+
+			$params['shop_name'] = Context::getContext()->shop->name;
 			
-			$params['shop_url'] = Tools::getShopDomainSsl(true, true);
+			$params['shop_url'] = $base_url;
 			
-			$params['customer_name'] = $customer->first_name . ' ' . $customer->last_name;
+			$params['customer_name'] = $customer->firstname . ' ' . $customer->lastname;
 
 
 
@@ -387,7 +397,7 @@ extends ModuleFrontController {
 
 			// TODO: Should check tbk_transaction_type value
 			// For now this will work
-			$params['tbk_transaction_type'] = $this->l('Venta');
+			$params['tbk_transaction_type'] = $this->module->l('Venta');
 
 			$params['tbk_amount'] = ($tbk_amount[1] / 100);
 			
@@ -399,11 +409,7 @@ extends ModuleFrontController {
 
 			$params['string'] = print_r($params, true);
 
-			
-			// Look for webpay logo
-			// inside the current folder
-			// $logo = $base_url
-			// 		. "modules/{$webpaykcc->name}/logo.png";
+			$params['logo'] = $this->logo;
 
 			// Now we pass the data
 			// to smarty and render
@@ -414,12 +420,30 @@ extends ModuleFrontController {
 			$this->setTemplate('success.tpl');
 
 		} else {
+
+			// for generating pages
+			$base_url = Tools::getShopDomainSsl(true, true) 
+						. __PS_BASE_URI__;
+
+ 			// Base URL for success
+			// or failure pages
+			$module_url = "index.php?fc=module&module="
+						. "{$webpaykcc->name}&controller="
+						. "validate"
+						. "&cartId=" 
+						. $cart_id;
+
 			
+			$failure_page = $base_url . $module_url . "&return=error";
+
 			// set the error message
 			
 			$this->error_message = $error_message;
 
-			$this->handleError();
+			// Redirect to failure
+
+			// $this->handleError();
+			Tools::redirect($failure_page);
 		}
 
     }
@@ -428,7 +452,12 @@ extends ModuleFrontController {
     // show this page
     private function handleError() {
 
-		$cart_id = (isset($_POST['TBK_ORDEN_COMPRA']) ? $_POST['TBK_ORDEN_COMPRA'] : 0);
+    	$cart_id = (isset($_GET['cartId']) ? $_GET['cartId'] : 0);
+
+		$cart_id = (isset($_POST['TBK_ORDEN_COMPRA']) ? $_POST['TBK_ORDEN_COMPRA'] : $cart_id);
+ 
+		if($cart_id == '' || is_null($cart_id))
+			$cart_id = $this->module->l('No disponible');
 
 		$error_message = (isset($this->error_message) ? $this->error_message : null);
 
@@ -436,6 +465,8 @@ extends ModuleFrontController {
 		if(!is_null($error_message)) {
 			
 			$path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
+
+			$kccLogPath = Configuration::get(KCC_LOG);
 
 			if($kccLogPath){
 				$path = $kccLogPath;
@@ -458,7 +489,8 @@ extends ModuleFrontController {
 
     	// Fill the params
         $this->context->smarty->assign(array(
-        	'cart_id' => $cart_id
+        	'cart_id' => $cart_id,
+        	'logo' => $this->logo
 		));
 
 		$this->setTemplate('failure.tpl');	
