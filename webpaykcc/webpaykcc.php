@@ -132,6 +132,7 @@ class WebpayKcc extends PaymentModule {
 				|| !Configuration::deleteByName(KCC_URL)
 				|| !Configuration::deleteByName(KCC_LOG)
 				|| !Configuration::deleteByName(KCC_WAITING_PAYMENT_STATE)
+				|| !Configuration::deleteByName(KCC_TOC_PAGE_URL)
 				|| !parent::uninstall()
 			)
 
@@ -310,6 +311,7 @@ class WebpayKcc extends PaymentModule {
 			Configuration::updateValue(KCC_PATH, Tools::getValue('kccPath'));
 			Configuration::updateValue(KCC_URL, Tools::getValue('kccURL'));
 			Configuration::updateValue(KCC_LOG, Tools::getValue('kccLogPath'));
+			Configuration::updateValue(KCC_TOC_PAGE_URL, Tools::getValue('kccTocPage'));
 
 			// Update the internal vars
 			$this->setModuleSettings();
@@ -344,6 +346,7 @@ class WebpayKcc extends PaymentModule {
 			'data_kccPath' => $this->kccPath,
 			'data_kccURL' => $this->kccURL,
 			'data_kccLogPath' => $this->kccLogPath,
+			'data_kccTocPage' => $this->kccTocPage,
 			'version' => $this->version,
 			'img_header' => $img_header,
 			'post_url' => $post_url
@@ -374,6 +377,10 @@ class WebpayKcc extends PaymentModule {
 			$this->_errors['kccLogPath'] = $this->l('KCC Log Path is not Set');
 		}
 
+		if($this->kccTocPage == '') {
+			$this->_errors['kccTocPage'] = $this->l('Terms and Conditions Page URL not Set');
+		}
+
 
 	}
 
@@ -384,5 +391,6 @@ class WebpayKcc extends PaymentModule {
 		$this->kccPath = Configuration::get(KCC_PATH);
 		$this->kccURL = Configuration::get(KCC_URL);
 		$this->kccLogPath = Configuration::get(KCC_LOG);
+		$this->kccTocPage = Configuration::get(KCC_TOC_PAGE_URL);
 	}
 }

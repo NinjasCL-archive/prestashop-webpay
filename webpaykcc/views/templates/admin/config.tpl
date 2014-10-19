@@ -44,8 +44,23 @@
 
         <label for="kccLogPath">{l s='KCC Log Path' mod='webpaykcc'}</label>
 
-        <div class="margin-form"><input type="text" size="33" name="kccLogPath"
-                                        id="kccLogPath" value="{$data_kccLogPath}"/></div>
+        <div class="margin-form">
+            <input type="text" size="33" name="kccLogPath" id="kccLogPath" value="{$data_kccLogPath}"/>
+        </div>
+
+
+        {if isset($errors.kccTocPage)}
+            <div class="error">
+                <p>{$errors.kccTocPage}</p>
+            </div>
+        {/if}
+
+        <label for="kccTocPage">{l s='Terms and Conditions Page URL' mod='webpaykcc'}</label>
+
+        <div class="margin-form">
+            <input type="text" size="33" name="kccTocPage" id="kccTocPage" value="{$data_kccTocPage}"/>
+        </div>
+
 
         <center><input type="submit" name="webpaykcc_updateSettings" value="{l s='Save Settings' mod='webpaykcc'}"
                        class="button" style="cursor: pointer; display:"/></center>
