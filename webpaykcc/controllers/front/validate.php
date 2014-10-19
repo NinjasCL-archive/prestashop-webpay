@@ -98,8 +98,10 @@ extends ModuleFrontController {
 		$tbk_log_path = null;
 		$tbk_cache_path = null;
 
+		// Paths from Configuration
 		$kccPath = Configuration::get(KCC_PATH);
 		$kccLogPath = Configuration::get(KCC_LOG);
+		$kccTocPage = Configuration::get(KCC_TOC_PAGE_URL);
 
 		$cart = null;
 		$order = null;
@@ -280,12 +282,9 @@ extends ModuleFrontController {
 			}
 
 
-			// Add info to Params
+			// Start Adding info to Params
 			
-			$params['tbk_accounting_year'] = $tbk_accounting_year;
-
-			$params['tbk_transaction_year'] = $tbk_transaction_year;
-
+			
 			// Format transaction date
 			$params['tbk_transaction_date'] = substr($tbk_transaction_date[1], 2, 2) . '-' 
 									. substr($tbk_transaction_date[1], 0, 2) . '-' 
@@ -349,18 +348,56 @@ extends ModuleFrontController {
 
 
 			// Helper closure
-			$getOrderTotalAmount = function($cart) {
+			// $getOrderTotalAmount = function($cart) {
 				
-				$order_total = 0;
+			// 	$order_total = 0;
 
-				if($cart) {
-	    			$order_total = Tools::ps_round(floatval(
-	    						   $cart->getOrderTotal(true, Cart::BOTH)), 0);
-	    		}
+			// 	if($cart) {
+	  //   			$order_total = Tools::ps_round(floatval(
+	  //   						   $cart->getOrderTotal(true, Cart::BOTH)), 0);
+	  //   		}
 
-	    		return $order_total;
-			};
+	  //   		return $order_total;
+			// };
 
+
+			// Add more info to params
+
+			// General Info
+
+			$params['toc_page'] = $kccTocPage;
+
+			$params['shop_name'] = $this->config->get('config_name');
+			
+			$params['shop_url'] = Tools::getShopDomainSsl(true, true);
+			
+			$params['customer_name'] = $customer->first_name . ' ' . $customer->last_name;
+
+
+
+			// Transbank Info
+
+			$params['tbk_accounting_year'] = $tbk_accounting_year;
+
+			$params['tbk_transaction_year'] = $tbk_transaction_year;
+			
+			$params['tbk_mac'] = $tbk_mac[1];
+			
+			$params['tbk_cart_id'] = $tbk_cart_id[1];
+
+			// TODO: Should check tbk_transaction_type value
+			// For now this will work
+			$params['tbk_transaction_type'] = $this->l('Venta');
+
+			$params['tbk_amount'] = ($tbk_amount[1] / 100);
+			
+			$params['tbk_auth_code'] = $tbk_auth_code[1];
+			
+			$params['tbk_card_last_digit'] = '************' . $tbk_card_last_digit[1];			
+			
+			$params['tbk_transaction_id'] = $tbk_transaction_id[1];
+
+			$params['string'] = print_r($params, true);
 
 			
 			// Look for webpay logo
@@ -421,7 +458,7 @@ extends ModuleFrontController {
 
     	// Fill the params
         $this->context->smarty->assign(array(
-        	'cart_id' = $cart_id
+        	'cart_id' => $cart_id
 		));
 
 		$this->setTemplate('failure.tpl');	
