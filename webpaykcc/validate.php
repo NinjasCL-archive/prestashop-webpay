@@ -273,8 +273,8 @@ class WebpayKccCallback {
 
 		if(isset($cart) && is_object($cart)) {
 
-			// Get order data
-			$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
+		// Get order data
+		$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
 	    	
 	    	$order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
 
@@ -322,11 +322,22 @@ class WebpayKccCallback {
 		   	 $error_message .= $e->getMessage();
 		   	 $result = KCC_REJECTED_RESULT;
 		   }
+		   
+		   // Last check in order to ensure that 
+		   // the order really changed it's state to completed
+		   // this is made outside all the ifs in order to
+		   // really check the state at the end.
+		   
+		   if($order->current_state != $order_status_completed) {
+		   	$result = KCC_REJECTED_RESULT;
+			$error_message .= "\n Order State is not Completed (State Number: $order_status_completed)."
+			                  ."\n Current State Number: $order->current_state";
+		   }
 
 		}
 
 		// Register Error in Log if present
-		if(!is_null($error_message)) {
+		if(!is_null($error_message) || $result == KCC_REJECTED_RESULT) {
 			
 			$path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
 
@@ -346,6 +357,10 @@ class WebpayKccCallback {
 			fwrite($error_log, $text);
 							
 			fclose($error_log);
+			
+			// If we got and error in any point
+			// set the order state to failed
+			$order->setCurrentState($order_status_failed);
 
 		}
 
