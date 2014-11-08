@@ -326,15 +326,48 @@ class WebpayKcc extends PaymentModule {
 		// For sending the form
 		$post_url =  Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']);
 
+
+
+		// These will be the placeholders inside the paths
+
+		$base_url = Tools::getShopDomainSsl(true, true)
+					. __PS_BASE_URI__;
+
+		$base_path = realpath(dirname(__FILE__)) . '/';
+		
+
+		$cgi_path = $base_path . 'cgi-bin/';
+
+		$log_path = $cgi_path . 'log/';
+
+		$cgi_url = $base_url . "cgi-bin/";
+
+		$toc_url = $base_url . "content/<page>";
+
+		$validation_url = $base_url . "modules/" . $this->name . "/validate.php";
+
 		$this->context->smarty->assign(array(
 			'errors' => $this->_errors,
 			'data_kccPath' => $this->kccPath,
 			'data_kccURL' => $this->kccURL,
+			
 			'data_kccLogPath' => $this->kccLogPath,
 			'data_kccTocPage' => $this->kccTocPage,
+			
 			'version' => $this->version,
 			'img_header' => $img_header,
-			'post_url' => $post_url
+			
+			'post_url' => $post_url,
+			'base_path' => $base_path,
+			
+			'cgi_path' => $cgi_path,
+			
+			'log_path' => $log_path,
+			'base_url' => $base_url,
+			
+			'cgi_url' => $cgi_url,
+			'toc_url' => $toc_url,
+			'validation_url' => $validation_url
 		));
 
 		// Render the template
