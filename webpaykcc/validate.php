@@ -360,7 +360,10 @@ class WebpayKccCallback {
 			
 			// If we got and error in any point
 			// set the order state to failed
-			$order->setCurrentState($order_status_failed);
+			if(isset($order) && is_object($order)) {
+
+				$order->setCurrentState($order_status_failed);
+			}
 
 		}
 
