@@ -333,7 +333,7 @@ class WebpayKcc extends PaymentModule {
 		$base_url = Tools::getShopDomainSsl(true, true)
 					. __PS_BASE_URI__;
 
-		$base_path = realpath(dirname(__FILE__)) . '/';
+		$base_path = realpath(dirname('../index.php')) . '/';
 		
 
 		$cgi_path = $base_path . 'cgi-bin/';
