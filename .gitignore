@@ -39,3 +39,6 @@ old.backup/
 
 # Example Codes
 example-code/
+
+#Mac Files
+.DS_STORE
