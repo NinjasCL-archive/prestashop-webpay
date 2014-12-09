@@ -6,7 +6,7 @@
   Version: 1.0
   Author URI: www.cervezapps.cl
   Plugin URI: https://github.com/clsource/prestashop-webpay
-  
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License or any later version.
@@ -47,7 +47,7 @@ class WebpayKccCallback {
 	}
 
 	public function confirm() {
-		
+
 		// Get Webpay Post Data
 
 		// Check if the Post Data exists
@@ -57,7 +57,7 @@ class WebpayKccCallback {
 		$order_id = (isset($_POST['TBK_ORDEN_COMPRA']) ? $_POST['TBK_ORDEN_COMPRA'] : null);
 
 		$response = (isset($_POST['TBK_RESPUESTA']) ? $_POST['TBK_RESPUESTA'] : null);
-		
+
 		$tbk_total_amount = (isset($_POST['TBK_MONTO']) ? $_POST['TBK_MONTO'] : null);
 
 
@@ -68,7 +68,7 @@ class WebpayKccCallback {
 		$kccPath = Configuration::get(KCC_PATH);
 		$kccLogPath = Configuration::get(KCC_LOG);
 
-		
+
 		// Default Values
 		$result = KCC_REJECTED_RESULT;
 
@@ -79,7 +79,7 @@ class WebpayKccCallback {
 
 		// Log helper closure
 		$logger = function($message) {
-			
+
 			$kccLogPath = Configuration::get(KCC_LOG);
 
 			$today = date('Y-m-d');
@@ -158,7 +158,7 @@ class WebpayKccCallback {
 		// Helper closure
 		// for the total amount
 		$getOrderTotalAmount = function($cart) {
-			
+
 			$order_total = 0;
 
 			if($cart) {
@@ -180,7 +180,7 @@ class WebpayKccCallback {
 			if(isset($order->id) && isset($cart->id)) {
 
 				$logger("Cart and Order Exists");
-				
+
 				// Now we must check the log file
 				if(isset($session_id) && file_exists($tbk_log_path)) {
 
@@ -223,12 +223,12 @@ class WebpayKccCallback {
 							}
 
 							fclose($tbk_cache);
-							
+
 							// Execute the CGI Check Script
 							$logger("Start CGI Verification Process");
 
 							if(KCC_USE_EXEC) {
-								
+
 								$logger("Using Exec");
 
 								// Store the result in $tbk_result
@@ -248,25 +248,25 @@ class WebpayKccCallback {
 
 							// Check the result
 							if (isset($tbk_result[0]) && $tbk_result[0] == KCC_VERIFICATION_OK) {
-								
+
 								$logger("CGI Verification OK");
 
 								// Check Order
 
-								if(isset($order->id) && 
+								if(isset($order->id) &&
 								   trim($order_id) == trim($tbk_order_id) &&
 								   trim($cart->id) == trim($tbk_order_id)) {
-									
+
 									$logger("Orders are Equal");
 
 									// Check Amount
-									
+
 									$order_amount = $getOrderTotalAmount($cart);
 
 									// Needed 00 at the end
 									$tbk_order_amount = $order_amount . '00';
 
-									if(isset($tbk_total) && 
+									if(isset($tbk_total) &&
 									   isset($tbk_total_amount) &&
 									   $tbk_total == $tbk_order_amount &&
 									   $tbk_total == $tbk_total_amount &&
@@ -294,7 +294,7 @@ class WebpayKccCallback {
 								$error_message .= "Verification failure " . print_r($tbk_result, true);
 								$logger($error_message);
 							}
-							
+
 
 						} else {
 							$error_message .= "Problem with KCC Path";
@@ -323,12 +323,7 @@ class WebpayKccCallback {
 
 			$logger($error_message);
 
-			// Result must be Accepted
-			// if there is a response 
-			// but is not OK
-
-			$result = KCC_ACCEPTED_RESULT;
-		} 
+		}
 
 
 
@@ -341,7 +336,7 @@ class WebpayKccCallback {
 
 			// Get order data
 			$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
-	    	
+
 	    	$order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
 
 	    	$order_status = $order_status_failed;
@@ -350,8 +345,8 @@ class WebpayKccCallback {
 
 	    	$order_waiting_payment = (int) Configuration::get(KCC_WAITING_PAYMENT_STATE);
 
-			if(isset($response) && 
-			   $response == KCC_OK_RESPONSE && 
+			if(isset($response) &&
+			   $response == KCC_OK_RESPONSE &&
 			   $result == KCC_ACCEPTED_RESULT &&
 			   is_null($error_message)) {
 
@@ -368,14 +363,14 @@ class WebpayKccCallback {
 
 				// Change Order State
 				if(isset($order) && is_object($order)) {
-					
+
 					// Only change the state if is waiting payment
 					if($order->current_state == $order_waiting_payment) {
-						
+
 						$order->setCurrentState($order_status);
 
 					} else {
-						
+
 						$result = KCC_REJECTED_RESULT;
 						$error_message .= "\n Order State is not Waiting Payment";
 
@@ -398,20 +393,20 @@ class WebpayKccCallback {
 
 		   	 $logger($error_message);
 		   }
-		   
-		   // Last check in order to ensure that 
+
+		   // Last check in order to ensure that
 		   // the order really changed it's state to completed
 		   // this is made outside all the ifs in order to
 		   // really check the state at the end.
-		   
+
 		   if($order->current_state == $order_status_completed) {
 
 		   		$logger("Order state is Completed");
 
 		   } else {
-		   	
+
 		   		$result = KCC_REJECTED_RESULT;
-			
+
 				$error_message .= "\n Order State is not Completed (State Number: $order_status_completed)."
 			                  ."\n Current State Number: $order->current_state";
 
@@ -420,7 +415,7 @@ class WebpayKccCallback {
 
 		} else {
 			$error_message .= "Cart Object Not Found\n";
-			
+
 			$result = KCC_REJECTED_RESULT;
 
 			$logger($error_message);
@@ -428,7 +423,7 @@ class WebpayKccCallback {
 
 		// Register Error in Log if present
 		if(!is_null($error_message) || $result == KCC_REJECTED_RESULT) {
-			
+
 			$path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
 
 			if($kccLogPath){
@@ -450,9 +445,9 @@ class WebpayKccCallback {
 			$text .= "#########################################\n";
 
 			fwrite($error_log, $text);
-							
+
 			fclose($error_log);
-			
+
 			// If we got and error in any point
 			// set the order state to failed
 			if(isset($order) && is_object($order)) {
@@ -464,12 +459,26 @@ class WebpayKccCallback {
 
 		// Send transbank the result
 		if($result == KCC_ACCEPTED_RESULT) {
-			
+
 			$logger("SUCCESS");
 
 		} else {
 
-			$logger("FAILURE");
+      // If the final result is not accepted
+      // Check the response.
+
+      // Result must be Accepted
+      // if there is a response
+      // but its value is not OK (0)
+
+      $message = "FAILURE";
+
+      if(isset($response)) {
+        $result = KCC_ACCEPTED_RESULT;
+        $message .= " with ACCEPTED RESULT (Response != 0) Response: $response";
+      }
+
+			$logger($message);
 
 		}
 
