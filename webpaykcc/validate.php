@@ -36,433 +36,440 @@ include_once (_PS_MODULE_DIR_ . 'webpaykcc/webpaykcc.php');
 
 class WebpayKccCallback {
 
-	public function init() {
-		define('_PS_ADMIN_DIR_', getcwd());
+  public function init() {
+    define('_PS_ADMIN_DIR_', getcwd());
 
         // Load Presta Configuration
         Configuration::loadConfiguration();
         Context::getContext()->link = new Link();
 
-		$this->confirm();
-	}
+    $this->confirm();
+  }
 
-	public function confirm() {
+  public function confirm() {
 
-		// Get Webpay Post Data
+    // Get Webpay Post Data
 
-		// Check if the Post Data exists
+    // Check if the Post Data exists
 
-		$session_id = (isset($_POST['TBK_ID_SESION']) ? $_POST['TBK_ID_SESION'] : null);
+    $session_id = (isset($_POST['TBK_ID_SESION']) ? $_POST['TBK_ID_SESION'] : null);
 
-		$order_id = (isset($_POST['TBK_ORDEN_COMPRA']) ? $_POST['TBK_ORDEN_COMPRA'] : null);
+    $order_id = (isset($_POST['TBK_ORDEN_COMPRA']) ? $_POST['TBK_ORDEN_COMPRA'] : null);
 
-		$response = (isset($_POST['TBK_RESPUESTA']) ? $_POST['TBK_RESPUESTA'] : null);
+    $response = (isset($_POST['TBK_RESPUESTA']) ? $_POST['TBK_RESPUESTA'] : null);
 
-		$tbk_total_amount = (isset($_POST['TBK_MONTO']) ? $_POST['TBK_MONTO'] : null);
+    $tbk_total_amount = (isset($_POST['TBK_MONTO']) ? $_POST['TBK_MONTO'] : null);
 
 
-		// Get the log files
-		$tbk_log_path = null;
-		$tbk_cache_path = null;
+    // Get the log files
+    $tbk_log_path = null;
+    $tbk_cache_path = null;
 
-		$kccPath = Configuration::get(KCC_PATH);
-		$kccLogPath = Configuration::get(KCC_LOG);
+    $kccPath = Configuration::get(KCC_PATH);
+    $kccLogPath = Configuration::get(KCC_LOG);
 
 
-		// Default Values
-		$result = KCC_REJECTED_RESULT;
+    // Default Values
+    $result = KCC_REJECTED_RESULT;
 
-		$error_message = "";
+    $error_message = "";
 
-		$cart = null;
+    $cart = null;
 
+    $basic_check_completed = false;
 
-		// Log helper closure
-		$logger = function($message) {
+    // Log helper closure
+    $logger = function($message) {
 
-			$kccLogPath = Configuration::get(KCC_LOG);
+      $kccLogPath = Configuration::get(KCC_LOG);
 
-			$today = date('Y-m-d');
+      $today = date('Y-m-d');
 
-			$now = date('Y-m-d H:i:s');
+      $now = date('Y-m-d H:i:s');
 
-			$name = "validation.$today.log";
+      $name = "validation.$today.log";
 
-			$path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
+      $path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
 
-			if($kccLogPath){
-				$path = $kccLogPath;
-			}
+      if($kccLogPath){
+        $path = $kccLogPath;
+      }
 
-			$logFile = $path . $name;
+      $logFile = $path . $name;
 
-			$log = fopen($logFile, 'a');
+      $log = fopen($logFile, 'a');
 
-			$text = "$now $message\n";
+      $text = "$now $message\n";
 
-			fwrite($log, $text);
-			fclose($log);
-		};
+      fwrite($log, $text);
+      fclose($log);
+    };
 
-		$logger("Start Validation");
+    $logger("Start Validation");
 
-		$message = "Params\n";
+    $message = "Params\n";
 
-		foreach($_POST as $key => $value) {
-			$message .= "$key => $value \n";
-		}
+    foreach($_POST as $key => $value) {
+      $message .= "$key => $value \n";
+    }
 
-		$logger($message);
+    $logger($message);
 
 
-		// Set the log paths
-		// and cart and order vars
+    // Set the log paths
+    // and cart and order vars
 
-		if(!is_null($order_id) && !is_null($session_id)) {
+    if(!is_null($order_id) && !is_null($session_id)) {
 
-			//  The log file was generated in front controller
-			$tbk_log_path = getKccLog($kccLogPath, $session_id);
+      //  The log file was generated in front controller
+      $tbk_log_path = getKccLog($kccLogPath, $session_id);
 
-			// The cache file is needed for validation
-			$tbk_cache_path = $tbk_log_path . '.cache';
+      // The cache file is needed for validation
+      $tbk_cache_path = $tbk_log_path . '.cache';
 
-			// Get cart data
-			// $order_id is set in /controllers/front/payment.php
-			// as the current cart id
-			try {
+      // Get cart data
+      // $order_id is set in /controllers/front/payment.php
+      // as the current cart id
+      try {
 
-				$order = new Order(Order::getOrderByCartId($order_id));
+        $order = new Order(Order::getOrderByCartId($order_id));
 
-  				$cart = Cart::getCartByOrderId($order->id);
+          $cart = Cart::getCartByOrderId($order->id);
 
-  			} catch(Exception $e) {
-  				$error_message .= $e->getMessage();
-  				$logger($error_message);
-  			}
-		}
+        } catch(Exception $e) {
+          $error_message .= $e->getMessage();
+          $logger($error_message);
+        }
+    }
 
 
-		// Check for params
-		if (is_null($session_id) ||
-			is_null($order_id) ||
-			is_null($response)  ||
-			is_null($tbk_total_amount)
-			) {
+    // Check for params
+    if (is_null($session_id) ||
+      is_null($order_id) ||
+      is_null($response)  ||
+      is_null($tbk_total_amount)
+      ) {
 
-			$error_message .= "Params Not Found\n";
+      $error_message .= "Params Not Found\n";
 
-			$logger($error_message);
+      $logger($error_message);
 
-		}
+    }
 
-		// Helper closure
-		// for the total amount
-		$getOrderTotalAmount = function($cart) {
+    // Helper closure
+    // for the total amount
+    $getOrderTotalAmount = function($cart) {
 
-			$order_total = 0;
+      $order_total = 0;
 
-			if($cart) {
-    			$order_total = Tools::ps_round(floatval(
-    						   $cart->getOrderTotal(true, Cart::BOTH)), 0);
-    		}
+      if($cart) {
+          $order_total = Tools::ps_round(floatval(
+                   $cart->getOrderTotal(true, Cart::BOTH)), 0);
+        }
 
-    		return $order_total;
-		};
+        return $order_total;
+    };
 
-		// Start Verification Process
+    // Start Verification Process
 
-		// Response must be OK
-		if(!is_null($response) && $response == KCC_OK_RESPONSE) {
+    // Response must be OK
+    if(!is_null($response) && $response == KCC_OK_RESPONSE) {
 
-			$logger("Response OK");
+      $logger("Response OK");
 
-			// Cart and Order must exist
-			if(isset($order->id) && isset($cart->id)) {
+      // Cart and Order must exist
+      if(isset($order->id) && isset($cart->id)) {
 
-				$logger("Cart and Order Exists");
+        $logger("Cart and Order Exists");
 
-				// Now we must check the log file
-				if(isset($session_id) && file_exists($tbk_log_path)) {
+        // Now we must check the log file
+        if(isset($session_id) && file_exists($tbk_log_path)) {
 
-					$logger("Log path File Exists");
+          $logger("Log path File Exists");
 
-					// Open the log file
-					$tbk_log = fopen($tbk_log_path, 'r');
+          // Open the log file
+          $tbk_log = fopen($tbk_log_path, 'r');
 
-					// Put everything inside in a string
-					$tbk_log_string = fgets($tbk_log);
+          // Put everything inside in a string
+          $tbk_log_string = fgets($tbk_log);
 
-					fclose($tbk_log);
+          fclose($tbk_log);
 
-					// $tbk_details is an array
-					// separated by semicolon
-					$tbk_details = explode(';', $tbk_log_string);
+          // $tbk_details is an array
+          // separated by semicolon
+          $tbk_details = explode(';', $tbk_log_string);
 
-					// Detail count must be > 0
-					if (isset($tbk_details) && count($tbk_details) >= 1) {
+          // Detail count must be > 0
+          if (isset($tbk_details) && count($tbk_details) >= 1) {
 
-						$logger("TBK Details exists");
+            $logger("TBK Details exists");
 
-						// Check kcc path
-						if(!(is_null($kccPath) || $kccPath == '')) {
+            // Check kcc path
+            if(!(is_null($kccPath) || $kccPath == '')) {
 
-							// We must check with the cgi
-							// so we need to create a cache
-							// with all the $_POST params
+              // We must check with the cgi
+              // so we need to create a cache
+              // with all the $_POST params
 
-							$tbk_total = $tbk_details[0];
+              $tbk_total = $tbk_details[0];
 
-							$tbk_order_id = $tbk_details[1];
+              $tbk_order_id = $tbk_details[1];
 
-							$tbk_cache = fopen($tbk_cache_path, 'w+');
+              $tbk_cache = fopen($tbk_cache_path, 'w+');
 
-							// Write all the vars to cache
-							foreach ($_POST as $tbk_key => $tbk_value) {
+              // Write all the vars to cache
+              foreach ($_POST as $tbk_key => $tbk_value) {
 
-								fwrite($tbk_cache, "$tbk_key=$tbk_value&");
-							}
+                fwrite($tbk_cache, "$tbk_key=$tbk_value&");
+              }
 
-							fclose($tbk_cache);
+              fclose($tbk_cache);
 
-							// Execute the CGI Check Script
-							$logger("Start CGI Verification Process");
+              // Execute the CGI Check Script
+              $logger("Start CGI Verification Process");
 
-							if(KCC_USE_EXEC) {
+              if(KCC_USE_EXEC) {
 
-								$logger("Using Exec");
+                $logger("Using Exec");
 
-								// Store the result in $tbk_result
-								// executing the script with the log cache file
-								// as param
+                // Store the result in $tbk_result
+                // executing the script with the log cache file
+                // as param
 
-								$command = $kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path;
+                $command = $kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path;
 
-								exec($command , $tbk_result);
+                exec($command , $tbk_result);
 
 
-							} else {
-								// Use perl
-								// TODO: Implement Perl Someday
-								$logger("Using Perl");
-							}
+              } else {
+                // Use perl
+                // TODO: Implement Perl Someday
+                $logger("Using Perl");
+              }
 
-							// Check the result
-							if (isset($tbk_result[0]) && $tbk_result[0] == KCC_VERIFICATION_OK) {
+              // Check the result
+              if (isset($tbk_result[0]) && $tbk_result[0] == KCC_VERIFICATION_OK) {
 
-								$logger("CGI Verification OK");
+                $logger("CGI Verification OK");
 
-								// Check Order
+                // Check Order
 
-								if(isset($order->id) &&
-								   trim($order_id) == trim($tbk_order_id) &&
-								   trim($cart->id) == trim($tbk_order_id)) {
+                if(isset($order->id) &&
+                   trim($order_id) == trim($tbk_order_id) &&
+                   trim($cart->id) == trim($tbk_order_id)) {
 
-									$logger("Orders are Equal");
+                  $logger("Orders are Equal");
 
-									// Check Amount
+                  // Check Amount
 
-									$order_amount = $getOrderTotalAmount($cart);
+                  $order_amount = $getOrderTotalAmount($cart);
 
-									// Needed 00 at the end
-									$tbk_order_amount = $order_amount . '00';
+                  // Needed 00 at the end
+                  $tbk_order_amount = $order_amount . '00';
 
-									if(isset($tbk_total) &&
-									   isset($tbk_total_amount) &&
-									   $tbk_total == $tbk_order_amount &&
-									   $tbk_total == $tbk_total_amount &&
-									   $tbk_total_amount == $tbk_order_amount) {
+                  if(isset($tbk_total) &&
+                     isset($tbk_total_amount) &&
+                     $tbk_total == $tbk_order_amount &&
+                     $tbk_total == $tbk_total_amount &&
+                     $tbk_total_amount == $tbk_order_amount) {
 
-									   	$logger("Amount are Equal");
-									    $logger("ACCEPT RESULT");
+                      // Everything is OK
+                      $result = KCC_ACCEPTED_RESULT;
+                      $error_message = null;
 
-										// Everything is OK
-										$result = KCC_ACCEPTED_RESULT;
-										$error_message = null;
+											$basic_check_completed = true;
 
-									} else {
-										$error_message .= "Wrong Total $tbk_total != $tbk_order_amount";
-										$logger($error_message);
-									}
+											$logger("Amount are Equal");
+											$logger("SHOULD ACCEPT RESULT");
 
-								} else {
-									$error_message .= "Wrong Order Id $tbk_order_id != $order_id\n";
-									$error_message .= "order_id $order_id tbk_order_id $tbk_order_id cart->id $order->id\n" . print_r($order, true);
-									$logger($error_message);
-								}
 
-							} else {
-								$error_message .= "Verification failure " . print_r($tbk_result, true);
-								$logger($error_message);
-							}
+                  } else {
+                    $error_message .= "Wrong Total $tbk_total != $tbk_order_amount";
+                    $logger($error_message);
+                  }
 
+                } else {
+                  $error_message .= "Wrong Order Id $tbk_order_id != $order_id\n";
+                  $error_message .= "order_id $order_id tbk_order_id $tbk_order_id cart->id $order->id\n" . print_r($order, true);
+                  $logger($error_message);
+                }
 
-						} else {
-							$error_message .= "Problem with KCC Path";
-							$logger($error_message);
-						}
+              } else {
+                $error_message .= "Verification failure " . print_r($tbk_result, true);
+                $logger($error_message);
+              }
 
-					} else {
-						$error_message .= "Log file is empty for path $tbk_log_path";
-						$logger($error_message);
-					}
 
-				} else {
-					$error_message .= "Log file does not exists for path $tbk_log_path";
-					$logger($error_message);
-				}
+            } else {
+              $error_message .= "Problem with KCC Path";
+              $logger($error_message);
+            }
 
-			} else {
-				$error_message .= "Order does not exist for Cart id $order_id\n";
-				$logger($error_message);
-			}
+          } else {
+            $error_message .= "Log file is empty for path $tbk_log_path";
+            $logger($error_message);
+          }
 
-		} else if(isset($response)){
+        } else {
+          $error_message .= "Log file does not exists for path $tbk_log_path";
+          $logger($error_message);
+        }
 
-			// Response Wasn't OK
-			$error_message .= "Response Not OK, Response : $response";
+      } else {
+        $error_message .= "Order does not exist for Cart id $order_id\n";
+        $logger($error_message);
+      }
 
-			$logger($error_message);
+    } else if(isset($response)){
 
-		}
+      // Response Wasn't OK
+      $error_message .= "Response Not OK, Response : $response";
 
+      $logger($error_message);
 
+    }
 
-		// Update Cart Status
-		// if Cart Exists
 
-		if(isset($cart) && is_object($cart)) {
 
-			$logger("Cart Object Exists");
+    // Update Cart Status
+    // if Cart Exists
 
-			// Get order data
-			$order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
+    if(isset($cart) && is_object($cart)) {
 
-	    	$order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
+      $logger("Cart Object Exists");
 
-	    	$order_status = $order_status_failed;
+      // Get order data
+      $order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
 
-	    	$order_total = $getOrderTotalAmount($cart);
+        $order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
 
-	    	$order_waiting_payment = (int) Configuration::get(KCC_WAITING_PAYMENT_STATE);
+        $order_status = $order_status_failed;
 
-			if(isset($response) &&
-			   $response == KCC_OK_RESPONSE &&
-			   $result == KCC_ACCEPTED_RESULT &&
-			   is_null($error_message)) {
+        $order_total = $getOrderTotalAmount($cart);
 
-				// Set Order as Paid
+        $order_waiting_payment = (int) Configuration::get(KCC_WAITING_PAYMENT_STATE);
 
-				$order_status = $order_status_completed;
+      if(isset($response) &&
+         $response == KCC_OK_RESPONSE &&
+         $result == KCC_ACCEPTED_RESULT &&
+         is_null($error_message)) {
 
-				$logger("Order State Should be Completed");
+        // Set Order as Paid
 
-			}
+        $order_status = $order_status_completed;
 
+        $logger("Order State Should be Completed");
 
-			try {
+      }
 
-				// Change Order State
-				if(isset($order) && is_object($order)) {
 
-					// Only change the state if is waiting payment
-					if($order->current_state == $order_waiting_payment) {
+      try {
 
-						$order->setCurrentState($order_status);
+        // Change Order State
+        if(isset($order) && is_object($order)) {
 
-					} else {
+          // Only change the state if is waiting payment
+          // This is the last step of verification
 
-						$result = KCC_REJECTED_RESULT;
-						$error_message .= "\n Order State is not Waiting Payment";
+          if($order->current_state == $order_waiting_payment) {
 
-						$logger($error_message);
+            $order->setCurrentState($order_status);
 
-					}
 
-				} else {
+          } else {
 
-					$result = KCC_REJECTED_RESULT;
-					$error_message .= "\nFailed to change order state";
+            $result = KCC_REJECTED_RESULT;
+            $error_message .= "\n Order State is not Waiting Payment";
 
-					$logger($error_message);
-				}
+            $logger($error_message);
 
-		   } catch (Exception $e) {
+          }
 
-		   	 $result = KCC_REJECTED_RESULT;
-		   	 $error_message .= $e->getMessage();
+        } else {
 
-		   	 $logger($error_message);
-		   }
+          $result = KCC_REJECTED_RESULT;
+          $error_message .= "\nFailed to change order state";
 
-		   // Last check in order to ensure that
-		   // the order really changed it's state to completed
-		   // this is made outside all the ifs in order to
-		   // really check the state at the end.
+          $logger($error_message);
+        }
 
-		   if($order->current_state == $order_status_completed) {
+       } catch (Exception $e) {
 
-		   		$logger("Order state is Completed");
+          $result = KCC_REJECTED_RESULT;
+          $error_message .= $e->getMessage();
 
-		   } else {
+          $logger($error_message);
+       }
 
-		   		$result = KCC_REJECTED_RESULT;
+       // Last check in order to ensure that
+       // the order really changed it's state to completed
+       // this is made outside all the ifs in order to
+       // really check the state at the end.
 
-				$error_message .= "\n Order State is not Completed (State Number: $order_status_completed)."
-			                  ."\n Current State Number: $order->current_state";
+       if($order->current_state == $order_status_completed) {
 
-				$logger($error_message);
-		   }
+           $logger("Order state is Completed");
 
-		} else {
-			$error_message .= "Cart Object Not Found\n";
+       } else {
 
-			$result = KCC_REJECTED_RESULT;
+           $result = KCC_REJECTED_RESULT;
 
-			$logger($error_message);
-		}
+        $error_message .= "\n Order State is not Completed (State Number: $order_status_completed)."
+                        ."\n Current State Number: $order->current_state";
 
-		// Register Error in Log if present
-		if(!is_null($error_message) || $result == KCC_REJECTED_RESULT) {
+        $logger($error_message);
+       }
 
-			$path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
+    } else {
+      $error_message .= "Cart Object Not Found\n";
 
-			if($kccLogPath){
-				$path = $kccLogPath;
-			}
+      $result = KCC_REJECTED_RESULT;
 
+      $logger($error_message);
+    }
 
-			$error_log_path = $path . 'validation.errors.log';
+    // Register Error in Log if present
+    if(!is_null($error_message) || $result == KCC_REJECTED_RESULT) {
 
-			$error_log = fopen($error_log_path, 'a');
+      $path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
 
-			$text = date('Y-m-d H:i:s') . "  Error: $error_message\n";
+      if($kccLogPath){
+        $path = $kccLogPath;
+      }
 
-			// Log params
-			foreach ($_POST as $key => $value) {
-				$text .= "$key => $value \n";
-			}
 
-			$text .= "#########################################\n";
+      $error_log_path = $path . 'validation.errors.log';
 
-			fwrite($error_log, $text);
+      $error_log = fopen($error_log_path, 'a');
 
-			fclose($error_log);
+      $text = date('Y-m-d H:i:s') . "  Error: $error_message\n";
 
-			// If we got and error in any point
-			// set the order state to failed
-			if(isset($order) && is_object($order)) {
+      // Log params
+      foreach ($_POST as $key => $value) {
+        $text .= "$key => $value \n";
+      }
 
-				$order->setCurrentState($order_status_failed);
-			}
+      $text .= "#########################################\n";
 
-		}
+      fwrite($error_log, $text);
 
-		// Send transbank the result
-		if($result == KCC_ACCEPTED_RESULT) {
+      fclose($error_log);
 
-			$logger("SUCCESS");
+      // If we got and error in any point
+      // set the order state to failed
+      if(isset($order) && is_object($order)) {
 
-		} else {
+        $order->setCurrentState($order_status_failed);
+      }
+
+    }
+
+    // Send transbank the result
+    if($result == KCC_ACCEPTED_RESULT) {
+
+      $logger("SUCCESS");
+
+    } else {
 
       // If the final result is not accepted
       // Check the response.
@@ -473,20 +480,20 @@ class WebpayKccCallback {
 
       $message = "FAILURE";
 
-      if(isset($response)) {
+      if(isset($response) && $basic_check_completed) {
         $result = KCC_ACCEPTED_RESULT;
         $message .= " with ACCEPTED RESULT (Response != 0) Response: $response";
       }
 
-			$logger($message);
+      $logger($message);
 
-		}
+    }
 
-		$logger("End Validation");
-		$logger("#################");
+    $logger("End Validation");
+    $logger("#################");
 
-		echo $result;
-	}
+    echo $result;
+  }
 }
 
 $notify = new WebpayKccCallback();
