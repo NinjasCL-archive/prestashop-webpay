@@ -477,12 +477,17 @@ class WebpayKccCallback {
       // Result must be Accepted
       // if there is a response
       // but its value is not OK (0)
-
+      // and between -8 and -1
       $message = "FAILURE";
 
-      if(isset($response) && $basic_check_completed) {
-        $result = KCC_ACCEPTED_RESULT;
-        $message .= " with ACCEPTED RESULT (Response != 0) Response: $response";
+      if(isset($response) && 
+         $basic_check_completed && 
+         is_numeric($response) && 
+         $response >= -8 &&
+         $response <= -1) {
+         	
+            $result = KCC_ACCEPTED_RESULT;
+            $message .= " with ACCEPTED RESULT (Response != 0) Response: $response";
       }
 
       $logger($message);
