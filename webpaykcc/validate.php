@@ -421,7 +421,7 @@ class WebpayKccCallback {
        }
 
     } else {
-      $error_message .= "Cart Object Not Found\n";
+      $error_message .= "\nCart Object Not Found\n";
 
       $result = KCC_REJECTED_RESULT;
 
@@ -481,7 +481,6 @@ class WebpayKccCallback {
       $message = "FAILURE";
 
       if(isset($response) && 
-         $basic_check_completed && 
          is_numeric($response) && 
          $response >= -8 &&
          $response <= -1) {
@@ -494,6 +493,7 @@ class WebpayKccCallback {
 
     }
 
+    $logger("Final Result: $result");
     $logger("End Validation");
     $logger("#################");
 
