@@ -22,7 +22,7 @@
 	<div class="row row-margin-bottom">
 		<div class="col-sm-6">
 			<img src="{$logo}">
-			{l s='You will be charged with the following amount' mod='webpaykcc'} ${$total_amount}
+			{l s='You will be charged with the following amount' mod='webpaykcc'} &nbsp; <h3>${$total_amount}</h3>
 		</div>
 		<div class="col-sm-6">
 			<button type="submit" class="button btn btn-default standard-checkout button-medium pull-right">

@@ -3,8 +3,8 @@
         <p class="payment_module">
 			<a href="{$link->getModuleLink('webpaykcc', 'payment')|escape:'html'}"
 				style="background: url({$logo}) no-repeat scroll 15px 12px #FBFBFB;"
-				title="{l s='Pay using Webpay'}" class="bankwire webpaykcc">
-            	{l s='Pay using Webpay'}
+				title="{l s='Pay using Webpay' mod='webpaykcc'}" class="bankwire webpaykcc">
+            	{l s='Pay using Webpay' mod='webpaykcc'}
             </a>
         </p>
     </div>
