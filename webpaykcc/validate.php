@@ -69,6 +69,11 @@ class WebpayKccCallback {
     $kccLogPath = Configuration::get(KCC_LOG);
 
 
+    // Cart Order Status 
+    $order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
+    $order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
+    $order_waiting_payment = (int) Configuration::get(KCC_WAITING_PAYMENT_STATE);
+
     // Default Values
     $result = KCC_REJECTED_RESULT;
 
@@ -338,16 +343,9 @@ class WebpayKccCallback {
 
       $logger("Cart Object Exists");
 
-      // Get order data
-      $order_status_completed = (int) Configuration::get('PS_OS_PAYMENT');
+      $order_status = $order_status_failed;
 
-        $order_status_failed    = (int) Configuration::get('PS_OS_ERROR');
-
-        $order_status = $order_status_failed;
-
-        $order_total = $getOrderTotalAmount($cart);
-
-        $order_waiting_payment = (int) Configuration::get(KCC_WAITING_PAYMENT_STATE);
+      $order_total = $getOrderTotalAmount($cart);
 
       if(isset($response) &&
          $response == KCC_OK_RESPONSE &&
