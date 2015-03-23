@@ -30,6 +30,7 @@ $_MODULE['<{webpaykcc}prestashop>config_9daf1fb753b42c3cdc8f1d01669cd6d8'] = 'Gu
 $_MODULE['<{webpaykcc}prestashop>confirmation_660d604f24f1cee6730e33262cc98857'] = 'Pagar Usando Webpay';
 $_MODULE['<{webpaykcc}prestashop>confirmation_8630898aa8a2c31f18ff406bcab447fd'] = 'El monto total de la compra es el siguiente';
 $_MODULE['<{webpaykcc}prestashop>confirmation_3dacb130bac464075f958f72f1148886'] = 'Pagar Carro';
+$_MODULE['<{webpaykcc}prestashop>confirmation_f1d3b424cd68795ecaa552883759aceb'] = 'Resumen del Pedido';
 $_MODULE['<{webpaykcc}prestashop>failure_5ea9bbd8a3be5bda4f0a8f377e685b0e'] = 'Transacción Fallida';
 $_MODULE['<{webpaykcc}prestashop>failure_50f24f8b99cb0c56d08a86f6f554cda9'] = 'Número de la Compra';
 $_MODULE['<{webpaykcc}prestashop>failure_b383c5b8061c9cd26734898fdc69c24d'] = 'Las Posibles causas de este rechazo son';
