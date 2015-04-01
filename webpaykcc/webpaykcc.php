@@ -43,7 +43,7 @@ class WebpayKcc extends PaymentModule {
 		$this->name = 'webpaykcc';
 		$this->tab = 'payments_gateways';
 
-		$this->version = '1.0.0';
+		$this->version = '1.0.1';
 		$this->author = 'Camilo Castro <camilo@cervezapps.cl>';
 
 		$this->need_instance = 1;
@@ -65,9 +65,9 @@ class WebpayKcc extends PaymentModule {
 		// Now some messages
 		$this->displayName = $this->l('Webpay KCC Payment');
 
-		$this->description = $this->l("Payment Gateway using Chile's Transbank Webpay KCC");
+		$this->description = $this->l('Payment Gateway using Chile Transbank Webpay KCC');
 
-		$this->confirmUninstall = $this->l("Payments with Webpay KCC will not be possible. Are you sure to uninstall?");
+		$this->confirmUninstall = $this->l('Payments with Webpay KCC will not be possible. Are you sure to uninstall?');
 
 
 		// Call internal setup methods
@@ -148,7 +148,7 @@ class WebpayKcc extends PaymentModule {
             
             $orderState = new OrderState(null, Configuration::get('PS_LANG_DEFAULT'));
             
-            $orderState->name = $this->l("Awaiting Webpay KCC Payment");
+            $orderState->name = $this->l('Awaiting Webpay KCC Payment');
 
             $orderState->invoice = false;
            

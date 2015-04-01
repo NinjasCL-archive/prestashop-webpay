@@ -3,6 +3,9 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{webpaykcc}prestashop>webpaykcc_a62cf85ce6655e24044ed72412f3b936'] = 'Pago con Webpay KCC';
+$_MODULE['<{webpaykcc}prestashop>webpaykcc_b95254b64b35b7ca4424ebe3cc8b6244'] = 'Sistema de Pago Usando Webpay de Transbank Chile.';
+$_MODULE['<{webpaykcc}prestashop>webpaykcc_02c267170b293593d7d5cb6b11f94614'] = 'Dejará de recibir pagos usando Webpay. ¿Seguro de Eliminar?.';
+$_MODULE['<{webpaykcc}prestashop>webpaykcc_54d20993e1eb076fd139e0b6b39a39ad'] = 'Esperando Pago con Webpay';
 $_MODULE['<{webpaykcc}prestashop>webpaykcc_ab7a9849c7fc2e8fdd99dab243ca6efd'] = 'Falta definir el Directorio del KCC';
 $_MODULE['<{webpaykcc}prestashop>webpaykcc_9eef733d37728f4a77d2b1fa7ba727e8'] = 'Falta definir la URL del KCC';
 $_MODULE['<{webpaykcc}prestashop>webpaykcc_a9912f1f5ba8f2453c473e4fb08cc2d0'] = 'Falta definir el Directorio Log del KCC';
