@@ -166,6 +166,8 @@ class WebpayKccCallback {
 
                         // Now we check the current state of the order and cart
                         if($order->current_state == $order_state_waiting_payment) {
+                            
+                            $logger("Order is Waiting Payment");
 
                             // The amounts must be equal
 
