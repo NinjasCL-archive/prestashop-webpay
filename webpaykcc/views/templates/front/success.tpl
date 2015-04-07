@@ -2,7 +2,7 @@
 
   <img src='{$logo}' />
   <h1>{l s='Compra Exitosa' mod='webpaykcc'}</h1>
-  <a href='{$toc_page}' target="_blank">{l s='Ver La Política de Devoluciones' mod='webpaykcc'}</a><br/>
+  <a href='{$toc_page}' target="_blank">{l s='Ver La Política de Devoluciones y/o Reembolsos' mod='webpaykcc'}</a><br/>
   <a href='{$order_history}' target="_blank">{l s='Ver Detalles de la Compra' mod='webpaykcc'}</a>
   <hr />
   <table style="margin-left: auto; margin-right: auto; text-align: left;">

@@ -184,7 +184,7 @@ class WebpayKccCallback {
                                 if (isset($tbk_session_id)) {
 
                                     //  The log file was generated in front controller
-                                    $tbk_log_path = getKccLog($kccLogPath, $session_id);
+                                    $tbk_log_path = getKccLog($kccLogPath, $tbk_session_id);
 
                                     if (file_exists($tbk_log_path)) {
 
