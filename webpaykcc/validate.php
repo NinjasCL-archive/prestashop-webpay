@@ -64,7 +64,8 @@ class WebpayKccCallback {
 
         $tbk_total_amount = (isset($_POST['TBK_MONTO']) ? trim($_POST['TBK_MONTO']) : null);
 
-        // Final Result Default Value
+        // Default Values
+
         $result = KCC_REJECTED_RESULT;
 
         $order = null;
@@ -74,7 +75,7 @@ class WebpayKccCallback {
         $isDone = false;
 
         // Log helper closure
-        $logger = function($_message, $_logPath = $kccLogPath) {
+        $logger = function($message) {
 
           $today = date('Y-m-d');
 
@@ -84,15 +85,17 @@ class WebpayKccCallback {
 
           $path = _PS_MODULE_DIR_ . 'webpaykcc/logs/';
 
-          if($_logPath){
-            $path = $_logPath;
+          $logPath = Configuration::get(KCC_LOG);
+
+          if($logPath){
+            $path = $logPath;
           }
 
           $logFile = $path . $name;
 
           $log = fopen($logFile, 'a');
 
-          $text = "$now : $_message\n";
+          $text = "$now : $message\n";
 
           fwrite($log, $text);
 
@@ -327,7 +330,7 @@ class WebpayKccCallback {
 
         if (!$isDone && isset($order->id)) {
             $order->setCurrentState($order_state_failed);
-            $logger("Order State was set to Failed")
+            $logger("Order State was set to Failed");
         }
 
         // End Validation Process
