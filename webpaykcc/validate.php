@@ -122,10 +122,17 @@ class WebpayKccCallback {
         $logger("#################");
 
         // Log Params Received
-        $logger("Params Received");
+        
+        if (count($_POST) > 0) {
 
-        foreach($_POST as $key => $value) {
-          $logger("$key => $value");
+            $logger("Params Received");
+
+            foreach($_POST as $key => $value) {
+              $logger("$key => $value");
+            }
+
+        } else {
+            $logger("Params Not Found");
         }
 
         // First we must check the tbk_response.
