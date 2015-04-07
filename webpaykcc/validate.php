@@ -139,6 +139,8 @@ class WebpayKccCallback {
         if(isset($tbk_response)) {
             
             if($tbk_response == KCC_OK_RESPONSE) {
+                
+                $logger("Response is OK");
 
                 // Now the response is OK, we must check the order
                 if (isset($tbk_order_id)) {
@@ -159,6 +161,8 @@ class WebpayKccCallback {
 
                     // Both order and cart must exist
                     if(isset($order->id) && isset($cart->id)) {
+                        
+                        $logger("Order Exists");
 
                         // Now we check the current state of the order and cart
                         if($order->current_state == $order_state_waiting_payment) {
@@ -168,10 +172,12 @@ class WebpayKccCallback {
                             $total_order_amount = $getOrderTotalAmount($cart);
 
                             // Needed 00 at the end
-                            $total_order_amount_formatted = $order_amount . '00';
+                            $total_order_amount_formatted = $total_order_amount . '00';
 
 
                             if ($total_order_amount_formatted == $tbk_total_amount) {
+                                
+                                $logger("Amounts are Equal");
 
                                 // Now check the session log file
                                 if (isset($tbk_session_id)) {
@@ -197,6 +203,8 @@ class WebpayKccCallback {
                                         if (isset($tbk_details) && 
                                             isset($tbk_details[0]) &&
                                             isset($tbk_details[1])) {
+
+                                            $logger("Session File Exists");
                                         
                                             $tbk_session_total_amount = $tbk_details[0];
 
@@ -205,6 +213,8 @@ class WebpayKccCallback {
                                             // Session values and POST values must be equal
                                             if ($tbk_session_total_amount == $tbk_total_amount &&
                                                 $tbk_session_order_id == $tbk_order_id) {
+
+                                                $logger("Session Values are Correct");
 
                                                 // Check KCC Path
                                                 if(!(is_null($kccPath) || $kccPath == '')) {
@@ -220,13 +230,15 @@ class WebpayKccCallback {
                                                     }
 
                                                     fclose($tbk_cache);
+                                                    
+                                                    $logger("Cache file created");
 
                                                     // Execute the CGI Check Script
                                                     $logger("Start CGI Verification Process");
 
                                                     if(KCC_USE_EXEC) {
 
-                                                        $logger("Using Exec");
+                                                        $logger("Verify Using Exec");
 
                                                         // Store the result in $tbk_result
                                                         // executing the script with the log cache file
@@ -239,7 +251,7 @@ class WebpayKccCallback {
                                                     } else {
                                                         // Use perl
                                                         // TODO: Implement Perl Someday
-                                                        $logger("Using Perl");
+                                                        $logger("Verify Using Perl");
                                                     }
 
                                                     // Check the result
