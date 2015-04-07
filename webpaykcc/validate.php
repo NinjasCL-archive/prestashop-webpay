@@ -174,7 +174,6 @@ class WebpayKccCallback {
                             // Needed 00 at the end
                             $total_order_amount_formatted = $total_order_amount . '00';
 
-
                             if ($total_order_amount_formatted == $tbk_total_amount) {
                                 
                                 $logger("Amounts are Equal");
