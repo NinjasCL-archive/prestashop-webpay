@@ -64,15 +64,6 @@ class WebpayKccCallback {
 
         $tbk_total_amount = (isset($_POST['TBK_MONTO']) ? trim($_POST['TBK_MONTO']) : null);
 
-        // Default Values
-
-        $result = KCC_REJECTED_RESULT;
-
-        $order = null;
-
-        $cart = null;
-
-        $isDone = false;
 
         // Log helper closure
         $logger = function($message) {
@@ -117,6 +108,16 @@ class WebpayKccCallback {
 
         };
 
+        // Default Values
+
+        $result = KCC_REJECTED_RESULT;
+
+        $order = null;
+
+        $cart = null;
+
+        $isDone = false;
+
         // Start Validation Process
         $logger("Start Validation");
         $logger("#################");
@@ -135,6 +136,29 @@ class WebpayKccCallback {
             $logger("Params Not Found");
         }
 
+        // Get cart data
+
+        if (isset($tbk_order_id)) {
+
+            try {
+
+                $order = new Order(Order::getOrderByCartId($tbk_order_id));
+
+                $cart = Cart::getCartByOrderId($order->id);
+
+            } catch(Exception $e) {
+
+              $logger($e->getMessage());
+
+            }
+
+        } else {
+            
+            $logger("TBK_ORDEN_COMPRA Not Set");
+        }
+
+        
+
         // First we must check the tbk_response.
         if(isset($tbk_response)) {
             
@@ -142,196 +166,182 @@ class WebpayKccCallback {
                 
                 $logger("Response is OK");
 
-                // Now the response is OK, we must check the order
-                if (isset($tbk_order_id)) {
+                // Both order and cart must exist
+                if(isset($order->id) && isset($cart->id)) {
+                    
+                    $logger("Order Exists");
 
-                    // Get cart data
-
-                    try {
-
-                        $order = new Order(Order::getOrderByCartId($tbk_order_id));
-
-                        $cart = Cart::getCartByOrderId($order->id);
-
-                    } catch(Exception $e) {
-
-                      $logger($e->getMessage());
-
-                    }
-
-                    // Both order and cart must exist
-                    if(isset($order->id) && isset($cart->id)) {
+                    // Now we check the current state of the order and cart
+                    if($order->current_state == $order_state_waiting_payment) {
                         
-                        $logger("Order Exists");
+                        $logger("Order is Waiting Payment");
 
-                        // Now we check the current state of the order and cart
-                        if($order->current_state == $order_state_waiting_payment) {
+                        // The amounts must be equal
+
+                        $total_order_amount = $getOrderTotalAmount($cart);
+
+                        // Needed 00 at the end
+                        $total_order_amount_formatted = $total_order_amount . '00';
+
+                        if ($total_order_amount_formatted == $tbk_total_amount) {
                             
-                            $logger("Order is Waiting Payment");
+                            $logger("Amounts are Equal");
 
-                            // The amounts must be equal
+                            // Now check the session log file
+                            if (isset($tbk_session_id)) {
 
-                            $total_order_amount = $getOrderTotalAmount($cart);
+                                //  The log file was generated in front controller
+                                $tbk_log_path = getKccLog($kccLogPath, $tbk_session_id);
 
-                            // Needed 00 at the end
-                            $total_order_amount_formatted = $total_order_amount . '00';
+                                if (file_exists($tbk_log_path)) {
 
-                            if ($total_order_amount_formatted == $tbk_total_amount) {
-                                
-                                $logger("Amounts are Equal");
+                                    // Open the log file
+                                    $tbk_log = fopen($tbk_log_path, 'r');
 
-                                // Now check the session log file
-                                if (isset($tbk_session_id)) {
+                                    // Put everything inside in a string
+                                    $tbk_log_string = fgets($tbk_log);
 
-                                    //  The log file was generated in front controller
-                                    $tbk_log_path = getKccLog($kccLogPath, $tbk_session_id);
+                                    fclose($tbk_log);
 
-                                    if (file_exists($tbk_log_path)) {
+                                    // $tbk_details is an array
+                                    // separated by semicolon
+                                    $tbk_details = explode(';', $tbk_log_string);
 
-                                        // Open the log file
-                                        $tbk_log = fopen($tbk_log_path, 'r');
+                                    // Details should exist
+                                    if (isset($tbk_details) && 
+                                        isset($tbk_details[0]) &&
+                                        isset($tbk_details[1])) {
 
-                                        // Put everything inside in a string
-                                        $tbk_log_string = fgets($tbk_log);
+                                        $logger("Session File Exists");
+                                    
+                                        $tbk_session_total_amount = $tbk_details[0];
 
-                                        fclose($tbk_log);
+                                        $tbk_session_order_id = $tbk_details[1];
 
-                                        // $tbk_details is an array
-                                        // separated by semicolon
-                                        $tbk_details = explode(';', $tbk_log_string);
+                                        // Session values and POST values must be equal
+                                        if ($tbk_session_total_amount == $tbk_total_amount &&
+                                            $tbk_session_order_id == $tbk_order_id) {
 
-                                        // Details should exist
-                                        if (isset($tbk_details) && 
-                                            isset($tbk_details[0]) &&
-                                            isset($tbk_details[1])) {
+                                            $logger("Session Values are Correct");
 
-                                            $logger("Session File Exists");
-                                        
-                                            $tbk_session_total_amount = $tbk_details[0];
+                                            // Check KCC Path
+                                            if(!(is_null($kccPath) || $kccPath == '')) {
 
-                                            $tbk_session_order_id = $tbk_details[1];
+                                                // The cache file is needed for validation
+                                                $tbk_cache_path = $tbk_log_path . '.cache';
 
-                                            // Session values and POST values must be equal
-                                            if ($tbk_session_total_amount == $tbk_total_amount &&
-                                                $tbk_session_order_id == $tbk_order_id) {
+                                                $tbk_cache = fopen($tbk_cache_path, 'w+');
 
-                                                $logger("Session Values are Correct");
-
-                                                // Check KCC Path
-                                                if(!(is_null($kccPath) || $kccPath == '')) {
-
-                                                    // The cache file is needed for validation
-                                                    $tbk_cache_path = $tbk_log_path . '.cache';
-
-                                                    $tbk_cache = fopen($tbk_cache_path, 'w+');
-
-                                                    // Write all the vars to cache
-                                                    foreach ($_POST as $tbk_key => $tbk_value) {
-                                                        fwrite($tbk_cache, "$tbk_key=$tbk_value&");
-                                                    }
-
-                                                    fclose($tbk_cache);
-                                                    
-                                                    $logger("Cache file created");
-
-                                                    // Execute the CGI Check Script
-                                                    $logger("Start CGI Verification Process");
-
-                                                    if(KCC_USE_EXEC) {
-
-                                                        $logger("Verify Using Exec");
-
-                                                        // Store the result in $tbk_result
-                                                        // executing the script with the log cache file
-                                                        // as param
-
-                                                        $command = $kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path;
-
-                                                        exec($command , $tbk_result);
-
-                                                    } else {
-                                                        // Use perl
-                                                        // TODO: Implement Perl Someday
-                                                        $logger("Verify Using Perl");
-                                                    }
-
-                                                    // Check the result
-                                                    $logger("Checking the CGI Result");
-
-                                                    if (isset($tbk_result[0]) && $tbk_result[0] == KCC_VERIFICATION_OK) {
-
-                                                        // Verification OK
-                                                        // Change the order status
-                                                        $logger("Transbank Verification Complete");
-
-                                                        $current_state = $order->current_state;
-
-                                                        $order->setCurrentState($order_state_completed);
-
-                                                        $logger("Order State Was Changed From ($current_state) to ({$order->current_state})");
-
-                                                        // Last Check
-                                                        if($order->current_state == $order_state_completed) {
-
-                                                            $result = KCC_ACCEPTED_RESULT;
-
-                                                            $logger("Order state is Completed");
-
-                                                            $isDone = true;
-
-                                                        } else {
-                                                            
-                                                            $result = KCC_REJECTED_RESULT;
-
-                                                            $logger("Order State is not Completed.");
-                                                        }
-
-                                                    } else {
-                                                        $logger("Failed CGI Verification " . print_r($tbk_result, true));
-                                                    }
-
-
-                                                } else {
-                                                    $logger("KCC Path not Found");
+                                                // Write all the vars to cache
+                                                foreach ($_POST as $tbk_key => $tbk_value) {
+                                                    fwrite($tbk_cache, "$tbk_key=$tbk_value&");
                                                 }
 
+                                                fclose($tbk_cache);
+                                                
+                                                $logger("Cache file created");
+
+                                                // Execute the CGI Check Script
+                                                $logger("Start CGI Verification Process");
+
+                                                if(KCC_USE_EXEC) {
+
+                                                    $logger("Verify Using Exec");
+
+                                                    // Store the result in $tbk_result
+                                                    // executing the script with the log cache file
+                                                    // as param
+
+                                                    $command = $kccPath . KCC_CGI_CHECK . ' ' . $tbk_cache_path;
+
+                                                    exec($command , $tbk_result);
+
+                                                } else {
+                                                    // Use perl
+                                                    // TODO: Implement Perl Someday
+                                                    $logger("Verify Using Perl");
+                                                }
+
+                                                // Check the result
+                                                $logger("Checking the CGI Result");
+
+                                                if (isset($tbk_result[0]) && $tbk_result[0] == KCC_VERIFICATION_OK) {
+
+                                                    // Verification OK
+                                                    // Change the order status
+                                                    $logger("Transbank Verification Complete");
+
+                                                    $current_state = $order->current_state;
+
+                                                    try {
+                                                    
+                                                        $order->setCurrentState($order_state_completed);
+                                                        
+                                                        $logger("Order State Was Changed From ($current_state) to ({$order->current_state})");
+                                                    
+                                                    } catch(Exception $e) {
+
+                                                        $logger($e->getMessage());
+                                                    }
+
+                                                    // Last Check
+                                                    if($order->current_state == $order_state_completed) {
+
+                                                        $result = KCC_ACCEPTED_RESULT;
+
+                                                        $logger("Order state is Completed");
+
+                                                        $isDone = true;
+
+                                                    } else {
+                                                        
+                                                        $result = KCC_REJECTED_RESULT;
+
+                                                        $logger("Order State is not Completed.");
+                                                    }
+
+                                                } else {
+                                                    $logger("Failed CGI Verification " . json_encode($tbk_result));
+                                                }
+
+
                                             } else {
-                                                $logger("Session and Post Vars are different");
-                                                $logger("Session Total : $tbk_session_total_amount");
-                                                $logger("TBK Total: $tbk_total_amount");
-                                                $logger("Session Order: $tbk_session_order_id");
-                                                $logger("TBK Order Id: $tbk_order_id");
+                                                $logger("KCC Path not Found");
                                             }
 
                                         } else {
-                                            $logger("$tbk_log_path does not contains valid data");
+                                            $logger("Session and Post Vars are different");
+                                            $logger("Session Total : $tbk_session_total_amount");
+                                            $logger("TBK Total: $tbk_total_amount");
+                                            $logger("Session Order: $tbk_session_order_id");
+                                            $logger("TBK Order Id: $tbk_order_id");
                                         }
 
                                     } else {
-                                        $logger("$tbk_log_path does not exist");
+                                        $logger("$tbk_log_path does not contains valid data");
                                     }
 
                                 } else {
-                                    $logger("TBK_ID_SESION not set");
+                                    $logger("$tbk_log_path does not exist");
                                 }
 
                             } else {
-                                $logger("Amounts are different ".
-                                        "$total_order_amount_formatted != $tbk_total_amount");
+                                $logger("TBK_ID_SESION not set");
                             }
 
-
                         } else {
-                            $logger("Order State is not Waiting Payment ($order_state_waiting_payment)");
-                            $logger("Current Order State is ({$order->current_state})");
+                            $logger("Amounts are different ".
+                                    "$total_order_amount_formatted != $tbk_total_amount");
                         }
 
+
                     } else {
-                        $logger("Order not found in DB");
+                        $logger("Order State is not Waiting Payment ($order_state_waiting_payment)");
+                        $logger("Current Order State is ({$order->current_state})");
                     }
 
                 } else {
-                    $logger("TBK_ORDEN_COMPRA Not Set");
+                    $logger("Order not found in DB");
                 }
 
             } else if($tbk_response >= -8 && 
@@ -348,9 +358,23 @@ class WebpayKccCallback {
             $logger("TBK_RESPUESTA not set");
         }
 
-        if (!$isDone && isset($order->id)) {
-            $order->setCurrentState($order_state_failed);
-            $logger("Order State was set to Failed");
+        // Set state to failed if not done
+
+        if (!$isDone && isset($order->current_state)) {
+
+            if ($order->current_state != $order_state_completed) {
+
+                try {
+                    
+                    $order->setCurrentState($order_state_failed);
+                    
+                    $logger("Order State was set to Failed ($order_state_failed)");
+
+                } catch(Exception $e) {
+                                                        
+                    $logger($e->getMessage());
+                }
+            }
         }
 
         // End Validation Process
