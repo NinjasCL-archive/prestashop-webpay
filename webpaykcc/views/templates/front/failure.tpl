@@ -4,7 +4,7 @@
 
   <table style="margin-left: auto; margin-right: auto; text-align: left;">
     <tr>
-      <th colspan="2" style="text-align: center;">{l s='Transacción Fallida' mod='webpaykcc'}</th>
+      <th colspan="2" style="text-align: center;">{l s='Transacción Rechazada' mod='webpaykcc'}</th>
     </tr>
     <tr>
       <td>{l s='Número de la Compra' mod='webpaykcc'}:</td>
