@@ -11,5 +11,19 @@ Para saber como configurar Webpay en el Servidor revisar la [Guía Webpay](https
 
 Soporte para Webpay KCC modo TR_NORMAL.
 
-Programado bajo la licencia **GPL 3** ver LICENSE
+
+
+## Importante
+Este código está programado bajo la Licencia GPL 3 (Ver LICENSE).  
+Lo que quiere decir que cualquier derivado del código que lo use debe ser liberado bajo la misma licencia.
+
+## Versión de Pago
+
+* ¿Necesitas una versión con una licencia que no exiga liberar tu código?
+* ¿Necesitas una versión que no necesite **exec** para funcionar?
+* ¿Necesitas ayuda en la instalación del Plugin?
+
+Contáctame camilo@cervezapps.cl 
+
+:)
 
