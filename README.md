@@ -14,7 +14,7 @@ Soporte para Webpay KCC modo TR_NORMAL.
 
 
 ## Importante (Copyright)
-Este código está programado bajo la Licencia GPL 3 (Ver LICENSE).  
+Este código está programado bajo la Licencia GPL 3 (Ver LICENCE).  
 Lo que quiere decir que cualquier derivado del código que lo use debe ser liberado bajo la misma licencia.
 
 Copyright 2014-2015 Camilo Castro Cabrera.
