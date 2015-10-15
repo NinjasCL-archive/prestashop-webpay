@@ -13,9 +13,15 @@ Soporte para Webpay KCC modo TR_NORMAL.
 
 
 
-## Importante
+## Importante (Copyright)
 Este código está programado bajo la Licencia GPL 3 (Ver LICENSE).  
 Lo que quiere decir que cualquier derivado del código que lo use debe ser liberado bajo la misma licencia.
+
+Copyright 2014-2015 Camilo Castro Cabrera.
+No incluir el autor original del código es una infracción a la licencia GPLv3 y se pueden realizar acciones legales para quienes recurran en este acto.
+
+Texto basado en README de https://bitbucket.org/ctala/woocommerce-webpay
+
 
 ## Versión de Pago
 
