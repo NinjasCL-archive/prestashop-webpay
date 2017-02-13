@@ -25,15 +25,3 @@ Copyright 2014-2015 Camilo Castro Cabrera.
 No incluir el autor original del código es una infracción a la licencia GPLv3 y se pueden realizar acciones legales para quienes recurran en este acto.
 
 Texto basado en README de https://bitbucket.org/ctala/woocommerce-webpay
-
-
-## Versión de Pago
-
-* ¿Necesitas una versión con una licencia que no exiga liberar tu código?
-* ¿Necesitas una versión que no necesite **exec** para funcionar?
-* ¿Necesitas ayuda en la instalación del Plugin?
-
-Contáctame camilo@cervezapps.cl 
-
-:)
-
