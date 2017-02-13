@@ -11,7 +11,11 @@ Para saber como configurar Webpay en el Servidor revisar la [Guía Webpay](https
 
 Soporte para Webpay KCC modo TR_NORMAL.
 
+## Obsoleto
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
+Transbank ha desechado el uso del KCC por lo que este plugin ya no será mantenido.
+Más información en http://www.transbankdevelopers.cl
 
 ## Importante (Copyright)
 Este código está programado bajo la Licencia GPL 3 (Ver LICENCE).  
